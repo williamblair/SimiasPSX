@@ -2,7 +2,12 @@
 
 #include "Cpu.hpp"
 
-void Cpu::Cpu(void){}
+void Cpu::Cpu(void)
+{
+    // the default program counter value in PSX
+    // the beginning of the BIOS
+    this->pc = 0xbfc00000;
+}
 
 void Cpu::run_next_instruction(void)
 {
