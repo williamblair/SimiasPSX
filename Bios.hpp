@@ -10,6 +10,8 @@
 // Bios images are always 512 kb in length
 const int BIOS_FILE_SIZE = 512 * 1024;
 
+const int BIOS_START = 
+
 class Bios
 {
 public:
@@ -25,6 +27,9 @@ public:
     
 private:
     std::vector<uint8_t> data;
+    
+    // check if a sent address is valid within the bios range
+    bool contains(uint32_t addr);
 };
 
 #endif
