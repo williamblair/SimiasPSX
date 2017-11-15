@@ -18,7 +18,7 @@ public:
     Bios(const string &fPath);
     
     // fetch the 32 bit little endian word at 'offset'
-    uint32_t Bios::load32(uint32_t offset);
+    uint32_t load32(uint32_t offset);
     
     
 private:
