@@ -12,7 +12,7 @@ Bios::Bios(const std::string &fPath)
                                  std::ifstreambuf_iterator<uint8_t>());
                                  
     // make sure the size seems correct
-    if(data.size() != BIOS_FILE_SIZE)
+    if(data.size() != BIOS_SIZE)
     {
         std::cerr << "Bios::Bios: Invalid Bios Size: " << data.size() << std::endl;
     }
