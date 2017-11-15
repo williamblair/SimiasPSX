@@ -8,9 +8,10 @@
 #define BIOS_H_INCLUDED
 
 // Bios images are always 512 kb in length
-const int BIOS_FILE_SIZE = 512 * 1024;
+const int BIOS_SIZE = 512 * 1024;
 
-const int BIOS_START = 
+// start of the bios in program counter memory
+const int BIOS_START = 0xbfc00000;
 
 class Bios
 {
