@@ -16,6 +16,11 @@ public:
     // constructor
     // args: file path of the bios file
     Bios(const string &fPath);
+    
+    // fetch the 32 bit little endian word at 'offset'
+    uint32_t Bios::load32(uint32_t offset);
+    
+    
 private:
     std::vector<uint8_t> data;
 };
