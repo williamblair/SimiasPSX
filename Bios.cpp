@@ -29,7 +29,7 @@ uint32_t Bios::load32(uint32_t offset)
 }
 
 // check if a sent address is valid within the bios range
-bool contains(uint32_t addr)
+bool Bios::contains(uint32_t addr)
 {
     return ((addr >= BIOS_START) && (addr <= BIOS_START + BIOS_SIZE)); 
 }
