@@ -17,3 +17,13 @@ Bios::Bios(const std::string &fPath)
         std::cerr << "Bios::Bios: Invalid Bios Size: " << data.size() << std::endl;
     }
 }
+
+uint32_t Bios::load32(uint32_t offset)
+{
+    uint32_t b0 = (uint32_t)data[offset + 0];
+    uint32_t b1 = (uint32_t)data[offset + 1];
+    uint32_t b2 = (uint32_t)data[offset + 2];
+    uint32_t b3 = (uint32_t)data[offset + 3];
+    
+    return (b0 | (b1 << 8) | (b2 << 16) | (b3 << 24));
+}
