@@ -18,6 +18,8 @@ public:
     Bios(const string &fPath);
     
     // fetch the 32 bit little endian word at 'offset'
+    // little endian meaning if we have word 0x12345678,
+    // its stored as [0x78, 0x65, 0x43, 0x21]
     uint32_t load32(uint32_t offset);
     
     
