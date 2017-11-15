@@ -8,8 +8,8 @@ Bios::Bios(const std::string &fPath)
     std::ifstream biosFile(fPath.c_str(), std::ios::binary);
     
     // read the data
-    data = std::vector<uint64_t>((std::ifstreambuf_iterator<uint64_t>(biosFile)),
-                                 std::ifstreambuf_iterator<uint64_t>());
+    data = std::vector<uint8_t>((std::ifstreambuf_iterator<uint8_t>(biosFile)),
+                                 std::ifstreambuf_iterator<uint8_t>());
                                  
     // make sure the size seems correct
     if(data.size() != BIOS_FILE_SIZE)
