@@ -26,7 +26,8 @@ void Cpu::decode_and_execute(uint32_t instruction)
     }
     catch(uint32_t i)
     {
-        std::cerr << "Cpu::decode_and_execute: Unhandled instruction: " << i << std::endl;
+        std::cerr << "Cpu::decode_and_execute: Unhandled instruction: " << 
+            std::hex << i << std::endl;
         exit(-1);
     }
 }

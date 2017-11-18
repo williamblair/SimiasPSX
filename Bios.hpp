@@ -24,6 +24,9 @@ public:
     // args: file path of the bios file
     Bios(const std::string &fPath);
     
+    // deconstructor
+    ~Bios(void);
+    
     // fetch the 32 bit little endian word at 'offset'
     // little endian meaning if we have word 0x12345678,
     // its stored as [0x78, 0x65, 0x43, 0x21]
@@ -33,7 +36,8 @@ public:
     bool contains(uint32_t addr);
     
 private:
-    std::vector<uint8_t> data;
+    unsigned char *data;
+    long           data_length;
     
 };
 
