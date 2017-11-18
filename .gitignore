@@ -1,0 +1,7 @@
+Debug
+.clang
+.codelite
+*.project
+*.txt
+*.workspace
+SimiasPSX.mk

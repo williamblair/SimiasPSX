@@ -6,10 +6,14 @@ Bios::Bios(const std::string &fPath)
 {
     // open the bios file
     std::ifstream biosFile(fPath.c_str(), std::ios::binary);
+    if(!biosFile.is_open()){
+        std::cerr << "Bios::Bios: Failed to open " << fPath << std::endl;
+        exit(-1);
+    }
     
     // read the data
-    data = std::vector<uint8_t>((std::ifstreambuf_iterator<uint8_t>(biosFile)),
-                                 std::ifstreambuf_iterator<uint8_t>());
+    data = std::vector<uint8_t>((std::istream_iterator<uint8_t>(biosFile)),
+                                 std::istream_iterator<uint8_t>());
                                  
     // make sure the size seems correct
     if(data.size() != BIOS_SIZE)
@@ -31,5 +35,5 @@ uint32_t Bios::load32(uint32_t offset)
 // check if a sent address is valid within the bios range
 bool Bios::contains(uint32_t addr)
 {
-    return ((addr >= BIOS_START) && (addr <= BIOS_START + BIOS_SIZE)); 
+    return ((addr >= BIOS_START) && (addr < BIOS_START + BIOS_SIZE)); 
 }

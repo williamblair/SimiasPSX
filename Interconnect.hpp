@@ -9,9 +9,14 @@
 class Interconnect
 {
 public:
+
+    Interconnect(void){};
+
     // constructor
     // args: a Bios object
-    Interconnect(Bios bios);
+    Interconnect(Bios &bios);
+
+    uint32_t load32(uint32_t address);
 
 private:
     Bios bios;
