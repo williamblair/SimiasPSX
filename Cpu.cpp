@@ -5,6 +5,10 @@
 
 #include <bitset>
 
+/************************************************/
+/**              CONSTRUCTOR                   **/
+/************************************************/
+
 Cpu::Cpu(Interconnect &interconnect)
 {
     // the default program counter value in PSX
@@ -23,6 +27,10 @@ Cpu::Cpu(Interconnect &interconnect)
         registers[i] = 0xdeadbeef;
     }
 }
+
+/************************************************/
+/**              GETTERS/SETTERS               **/
+/************************************************/
 
 bool Cpu::set_register(CPU_REGISTER r, uint32_t val)
 {
@@ -44,10 +52,26 @@ uint32_t Cpu::get_register(CPU_REGISTER r)
     return registers[r];
 }
 
-uint32_t Cpu::load32(const uint32_t address)
+/************************************************/
+/**               OPERATIONS                   **/
+/************************************************/
+
+void Cpu::op_lui(uint32_t instruction)
 {
-    return interconnect.load32(address);
+    uint32_t i = imm(instruction);
+    uint32_t reg = t(instruction);
+    
+    // low 16 bits set to 0
+    uint32_t v = i << 16;
+    
+    set_register((CPU_REGISTER)reg, v);
+    //std::cout << "Register " << reg << ": " << std::hex << "0x" << registers[reg] << std::endl;
+    exit(0);
 }
+
+/************************************************/
+/**            INSTRUCTION PARSING             **/
+/************************************************/
 
 // bits 31:26
 uint32_t Cpu::function(uint32_t instruction)
@@ -67,13 +91,13 @@ uint32_t Cpu::imm(uint32_t instruction)
     return instruction & 0xFFFF;
 }
 
-void Cpu::op_lui(uint32_t instruction)
+/************************************************/
+/**            EXECUTION FUNCTIONS             **/
+/************************************************/
+
+uint32_t Cpu::load32(const uint32_t address)
 {
-    uint32_t i = imm(instruction);
-    uint32_t reg = t(instruction);
-    
-    std::cerr << "WHAT NOW?!?!?!\n";
-    exit(0);
+    return interconnect.load32(address);
 }
 
 void Cpu::decode_and_execute(uint32_t instruction)

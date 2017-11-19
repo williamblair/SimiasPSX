@@ -5,3 +5,5 @@ Debug
 *.txt
 *.workspace
 SimiasPSX.mk
+SCPH1001.BIN
+main.exe
