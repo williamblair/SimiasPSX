@@ -53,36 +53,6 @@ uint32_t Cpu::get_register(CPU_REGISTER r)
 }
 
 /************************************************/
-/**               OPERATIONS                   **/
-/************************************************/
-
-void Cpu::op_lui(uint32_t instruction)
-{
-    uint32_t i = imm(instruction);
-    uint32_t reg = t(instruction);
-    
-    // low 16 bits set to 0
-    uint32_t v = i << 16;
-    
-    set_register((CPU_REGISTER)reg, v);
-    //std::cout << "Register " << reg << ": " << std::hex << "0x" << registers[reg] << std::endl;
-    //exit(0);
-}
-
-// bitwise or of the immediate value and the given register
-void Cpu::op_ori(uint32_t instruction)
-{
-    uint32_t i     = imm(instruction);
-    uint32_t reg   = t(instruction);
-    uint32_t store = s(instruction);
-    
-    uint32_t v = get_register((CPU_REGISTER)store) | i;
-    
-    set_register((CPU_REGISTER)reg, v);
-    std::cout << "Register " << reg << ": " << std::hex << v << std::endl;
-}
-
-/************************************************/
 /**            INSTRUCTION PARSING             **/
 /************************************************/
 
@@ -113,12 +83,64 @@ uint32_t Cpu::imm(uint32_t instruction)
 }
 
 /************************************************/
+/**               OPERATIONS                   **/
+/************************************************/
+
+void Cpu::op_lui(uint32_t instruction)
+{
+    uint32_t i = imm(instruction);
+    uint32_t reg = t(instruction);
+    
+    // low 16 bits set to 0
+    uint32_t v = i << 16;
+    
+    set_register((CPU_REGISTER)reg, v);
+    //std::cout << "Register " << reg << ": " << std::hex << "0x" << registers[reg] << std::endl;
+    //exit(0);
+}
+
+// bitwise or of the immediate value and the given register
+void Cpu::op_ori(uint32_t instruction)
+{
+    uint32_t i     = imm(instruction);
+    uint32_t reg   = t(instruction);
+    uint32_t store = s(instruction);
+    
+    uint32_t v = get_register((CPU_REGISTER)store) | i;
+    
+    set_register((CPU_REGISTER)reg, v);
+}
+
+// store 32 bits at a specific register into another register
+void Cpu::op_sw(uint32_t instruction)
+{
+    uint32_t i     = imm(instruction);
+    uint32_t reg   = t(instruction);
+    uint32_t store = s(instruction);
+    
+    uint32_t addr = get_register((CPU_REGISTER)store) + i;
+    uint32_t v    = get_register((CPU_REGISTER)reg);
+    
+    std::cout << "Addr: " << std::hex << "0x" << addr << std::endl;
+    std::cout << "Value: " <<  std::hex << "0x" << v << std::endl;
+    store32(addr, v);
+}
+
+/************************************************/
 /**            EXECUTION FUNCTIONS             **/
 /************************************************/
 
+// load the 32 bit value from the given address
 uint32_t Cpu::load32(const uint32_t address)
 {
     return interconnect.load32(address);
+}
+
+// store val at the given address
+void Cpu::store32(uint32_t addr, uint32_t val)
+{
+    // pass it along to the interconnect
+    interconnect.store32(addr, val);
 }
 
 void Cpu::decode_and_execute(uint32_t instruction)
@@ -146,6 +168,10 @@ void Cpu::decode_and_execute(uint32_t instruction)
             case 0b001101:
                 std::cout << "0b001101 (ori) case!\n";
                 op_ori(instruction);
+                break;
+            case 0b101011:
+                std::cout << "0b101011 (sw) case!\n";
+                op_sw(instruction);
                 break;
             default:
                 throw instruction;

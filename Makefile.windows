@@ -1,0 +1,24 @@
+# windows mingw makefile
+
+MINGW_DIR = C:\MinGW
+
+CC	   = $(MINGW_DIR)\bin\mingw32-g++.exe
+CFLAGS = 
+
+BIN	 = main.exe
+OBJS = Bios.o Cpu.o Interconnect.o main.o
+
+INCDIRS = 
+
+LIBDIRS =
+
+LIBS = 
+
+all: $(OBJS)
+	$(CC) $(CFLAGS) -o $(BIN) $(OBJS) $(INCDIRS) $(LIBDIRS) $(LIBS)
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c -o $@ $< $(INCDIRS)
+	
+clean:
+	del /F /Q $(OBJS) $(BIN)

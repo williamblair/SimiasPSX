@@ -49,8 +49,9 @@ public:
     Cpu(Interconnect &interconnect); // constructor
 
     uint32_t load32(const uint32_t address); // used by run_next_instruction
-    void run_next_instruction(void); // executes code at pc and increments pc
-    void decode_and_execute(uint32_t instruction); // used by run_next_instruction
+    void     store32(uint32_t addr, uint32_t val); // used by sw op
+    void     run_next_instruction(void); // executes code at pc and increments pc
+    void     decode_and_execute(uint32_t instruction); // used by run_next_instruction
     
     // get and set values in the Cpu register
     uint32_t get_register(CPU_REGISTER r);
@@ -73,6 +74,9 @@ private:
     
     // execute a ORI operation
     void op_ori(uint32_t instruction);
+    
+    // execute a SW operation (store word)
+    void op_sw(uint32_t instruction);
 
     uint32_t registers[32]; // 32 bit pc -> 32 registers -> 5 bits for specifying register
     uint32_t pc; // program counter
