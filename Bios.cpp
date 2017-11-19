@@ -43,12 +43,6 @@ Bios::Bios(const std::string &fPath)
             exit(-1);
         }
         
-        // debug print out
-        for(int i=1; i<=data_length; i++){
-            std::cout << std::hex << std::setw(2) << data[i-1] << " ";
-            if(i%5 == 0) std::cout << std::endl;
-        }
-        
         if(fp) fclose(fp);
     }
 }

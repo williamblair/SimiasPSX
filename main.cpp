@@ -8,7 +8,13 @@ int main(int argc, char **argv)
 {
     std::cout << "Hello World!\n";
     
-    Bios bios("../../SCPH1001.BIN");
+    if(argc != 2) 
+    {
+        std::cout << "Usage: " << argv[0] << "[bios_file]\n";
+        return 0;
+    }
+
+    Bios bios(argv[1]);
     
     Interconnect interconnect(bios);
     
