@@ -8,22 +8,22 @@
 #define CPU_H_INCLUDED
 
 enum CPU_REGISTER {
-    REG_ZERO, // zero register
-    REG_AT  , // assembler temporary
-    REG_V0  , // function return values
-    REG_V1  , 
-    REG_A0  , // function arguments
-    REG_A1  ,
-    REG_A2  ,
-    REG_A3  ,
-    REG_T0  , // temporary registers
-    REG_T1  ,
-    REG_T2  ,
-    REG_T3  ,
-    REG_T4  ,
-    REG_T5  ,
-    REG_T6  ,
-    REG_T7  ,
+    REG_ZERO, // zero register,           $0
+    REG_AT  , // assembler temporary,     $at 
+    REG_V0  , // function return values,  $v0
+    REG_V1  , //                          $v1
+    REG_A0  , // function arguments       $a0
+    REG_A1  , //                          $a1
+    REG_A2  , //                          $a2
+    REG_A3  , //                          $a3
+    REG_T0  , // temporary registers      $t0
+    REG_T1  , //                          $t1
+    REG_T2  , //                          $t2
+    REG_T3  , //                          $t3
+    REG_T4  , //                          $t4
+    REG_T5  , //                          $t5
+    REG_T6  , //                          $t6
+    REG_T7  , //                          $t7
     REG_S0  , // saved registers
     REG_S1  ,
     REG_S2  ,
@@ -60,14 +60,19 @@ private:
 
     // parses the instruction for the required bits for each piece of data
     // function - the instruction type (LUI, etc.) (bits 31:26)
+    // s - which value to store into? (bits 25:21)
     // t - which register to use (bits 20:16)
     // imm - the immediate value to use (bits 16:0)
     uint32_t function(uint32_t instruction);
     uint32_t t(uint32_t instruction);
+    uint32_t s(uint32_t instruction);
     uint32_t imm(uint32_t instruction);
     
     // execute a LUI operation
     void op_lui(uint32_t instruction);
+    
+    // execute a ORI operation
+    void op_ori(uint32_t instruction);
 
     uint32_t registers[32]; // 32 bit pc -> 32 registers -> 5 bits for specifying register
     uint32_t pc; // program counter

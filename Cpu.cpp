@@ -66,7 +66,20 @@ void Cpu::op_lui(uint32_t instruction)
     
     set_register((CPU_REGISTER)reg, v);
     //std::cout << "Register " << reg << ": " << std::hex << "0x" << registers[reg] << std::endl;
-    exit(0);
+    //exit(0);
+}
+
+// bitwise or of the immediate value and the given register
+void Cpu::op_ori(uint32_t instruction)
+{
+    uint32_t i     = imm(instruction);
+    uint32_t reg   = t(instruction);
+    uint32_t store = s(instruction);
+    
+    uint32_t v = get_register((CPU_REGISTER)store) | i;
+    
+    set_register((CPU_REGISTER)reg, v);
+    std::cout << "Register " << reg << ": " << std::hex << v << std::endl;
 }
 
 /************************************************/
@@ -82,7 +95,15 @@ uint32_t Cpu::function(uint32_t instruction)
 // bits 20:16
 uint32_t Cpu::t(uint32_t instruction)
 {
+    // 0x1f -> 0b11111 (5 bits)
     return (instruction >> 16) & 0x1F;
+}
+
+// bits 25:21
+uint32_t Cpu::s(uint32_t instruction)
+{
+    // 0x1f -> 0b11111 (5 bits)
+    return (instruction >> 21) & 0x1F;
 }
 
 // bits 16:0
@@ -119,18 +140,22 @@ void Cpu::decode_and_execute(uint32_t instruction)
         {
             // checks the binary value
             case 0b001111:
-                std::cout << "0b001111 case!\n";
+                std::cout << "0b001111 (LUI) case!\n";
                 op_lui(instruction);
                 break;
-            default:
+            case 0b001101:
+                std::cout << "0b001101 (ori) case!\n";
+                op_ori(instruction);
                 break;
+            default:
+                throw instruction;
+            //    break;
         }
      
         //std::cout << "Instruction: " << std::bitset<32>(instruction) << std::endl;
         //std::cout << " Mix val     : " << std::bitset<32>(0xFFFF) << std::endl;
         //std::cout << "Immediate val: " << std::bitset<32>(immediate_val) << std::endl;
         
-        throw instruction;
     }
     catch(uint32_t i)
     {
