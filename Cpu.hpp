@@ -70,6 +70,9 @@ private:
     uint32_t imm(uint32_t instruction);
     // returns the immediate value in 16 bits as a sign-extended 32 bit value
     uint32_t imm_se(uint32_t instruction);
+    uint32_t d(uint32_t instruction);
+    uint32_t subfunction(uint32_t instruction);
+    uint32_t shift(uint32_t instruction);
     
     // execute a LUI operation
     void op_lui(uint32_t instruction);
@@ -79,6 +82,9 @@ private:
     
     // execute a SW operation (store word)
     void op_sw(uint32_t instruction);
+    
+    // execute a SLL operation (shift left)
+    void op_sll(uint32_t instruction);
 
     uint32_t registers[32]; // 32 bit pc -> 32 registers -> 5 bits for specifying register
     uint32_t pc; // program counter

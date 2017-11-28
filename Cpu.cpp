@@ -62,18 +62,18 @@ uint32_t Cpu::function(uint32_t instruction)
     return instruction >> 26;
 }
 
-// bits 20:16
-uint32_t Cpu::t(uint32_t instruction)
-{
-    // 0x1f -> 0b11111 (5 bits)
-    return (instruction >> 16) & 0x1F;
-}
-
 // bits 25:21
 uint32_t Cpu::s(uint32_t instruction)
 {
     // 0x1f -> 0b11111 (5 bits)
     return (instruction >> 21) & 0x1F;
+}
+
+// bits 20:16
+uint32_t Cpu::t(uint32_t instruction)
+{
+    // 0x1f -> 0b11111 (5 bits)
+    return (instruction >> 16) & 0x1F;
 }
 
 // bits 16:0
@@ -88,6 +88,24 @@ uint32_t Cpu::imm_se(uint32_t instruction)
     int16_t v = (int16_t)(instruction & 0xffff);
     
     return (uint32_t)v;
+}
+
+// bits 15:11
+uint32_t Cpu::d(uint32_t instruction)
+{
+    return (instruction >> 11) & 0x1F;
+}
+
+// bits 5:0
+uint32_t Cpu::subfunction(uint32_t instruction)
+{
+    return instruction & 0x3F;
+}
+
+// get values to shift, which are stored in bits 10:6
+uint32_t Cpu::shift(uint32_t instruction)
+{
+    return (instruction >> 6) & 0x1F;
 }
 
 /************************************************/
@@ -122,7 +140,6 @@ void Cpu::op_ori(uint32_t instruction)
 // store 32 bits at a specific register into another register
 void Cpu::op_sw(uint32_t instruction)
 {
-    //uint32_t i     = imm(instruction);
     uint32_t i     = imm_se(instruction);
     uint32_t reg   = t(instruction);
     uint32_t store = s(instruction);
@@ -133,6 +150,18 @@ void Cpu::op_sw(uint32_t instruction)
     std::cout << "Addr: " << std::hex << "0x" << addr << std::endl;
     std::cout << "Value: " <<  std::hex << "0x" << v << std::endl;
     store32(addr, v);
+}
+
+// shift left logical
+void Cpu::op_sll(uint32_t instruction)
+{
+    uint32_t i     = shift(instruction);
+    uint32_t reg   = t(instruction);
+    uint32_t store  = d(instruction);
+    
+    uint32_t val = get_register((CPU_REGISTER)reg) << i;
+    
+    set_register((CPU_REGISTER)store, val);
 }
 
 /************************************************/
@@ -170,6 +199,18 @@ void Cpu::decode_and_execute(uint32_t instruction)
         switch(instruction_type)
         {
             // checks the binary value
+            case 0b000000:
+                std::cout << "0b000000 (SLL) case!\n";
+                switch(subfunction(instruction))
+                {
+                    case 0b000000:
+                        op_sll(instruction);
+                        break;
+                    default:
+                        std::cerr << "Cpu::decode_and_execute: NOOP (0b000000): unhandled subfunction\n";
+                        throw subfunction(instruction);
+                }
+                break;
             case 0b001111:
                 std::cout << "0b001111 (LUI) case!\n";
                 op_lui(instruction);
