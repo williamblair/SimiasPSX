@@ -68,6 +68,8 @@ private:
     uint32_t t(uint32_t instruction);
     uint32_t s(uint32_t instruction);
     uint32_t imm(uint32_t instruction);
+    // returns the immediate value in 16 bits as a sign-extended 32 bit value
+    uint32_t imm_se(uint32_t instruction);
     
     // execute a LUI operation
     void op_lui(uint32_t instruction);

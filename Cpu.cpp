@@ -82,6 +82,14 @@ uint32_t Cpu::imm(uint32_t instruction)
     return instruction & 0xFFFF;
 }
 
+// bits 16:0 but casted as a signed 32bit extended value first
+uint32_t Cpu::imm_se(uint32_t instruction)
+{
+    int16_t v = (int16_t)(instruction & 0xffff);
+    
+    return (uint32_t)v;
+}
+
 /************************************************/
 /**               OPERATIONS                   **/
 /************************************************/
@@ -114,7 +122,8 @@ void Cpu::op_ori(uint32_t instruction)
 // store 32 bits at a specific register into another register
 void Cpu::op_sw(uint32_t instruction)
 {
-    uint32_t i     = imm(instruction);
+    //uint32_t i     = imm(instruction);
+    uint32_t i     = imm_se(instruction);
     uint32_t reg   = t(instruction);
     uint32_t store = s(instruction);
     
