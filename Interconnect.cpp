@@ -75,9 +75,11 @@ void Interconnect::store32(uint32_t addr, uint32_t val)
                 }
                 break;
             default:
-                sprintf(e, "Unhandled write to MEM_CONTROL, address 0x%X", addr);
+                sprintf(e, "Interconnect::store32: Unhandled write to MEM_CONTROL, address 0x%X", addr);
                 throw e;
         }
+        
+        // There will be more here later, it seems that for now we are fine...
         
         sprintf(e, "Interconnect::store32: Unhandled address 0x%X", addr);
         throw e;

@@ -153,6 +153,7 @@ void Cpu::op_sw(uint32_t instruction)
 }
 
 // shift left logical
+// the preferred method to perfrom a noop is to shift left $zero
 void Cpu::op_sll(uint32_t instruction)
 {
     uint32_t i     = shift(instruction);
@@ -162,6 +163,18 @@ void Cpu::op_sll(uint32_t instruction)
     uint32_t val = get_register((CPU_REGISTER)reg) << i;
     
     set_register((CPU_REGISTER)store, val);
+}
+
+void Cpu::op_addiu(uint32_t instruction)
+{
+	uint32_t i     = imm_se(instruction);
+	uint32_t reg   = t(instruction);
+	uint32_t store = s(instruction);
+	
+	// would use wrapping add here but c will wrap for us
+	uint32_t val = get_register((CPU_REGISTER)reg) + i;
+	
+	set_register((CPU_REGISTER)reg, val);
 }
 
 /************************************************/
@@ -223,6 +236,10 @@ void Cpu::decode_and_execute(uint32_t instruction)
                 std::cout << "0b101011 (sw) case!\n";
                 op_sw(instruction);
                 break;
+            case 0b001001:
+				std::cout << "0b001001 (addiu) case!\n";
+				op_addiu(instruction);
+				break;
             default:
                 throw instruction;
             //    break;

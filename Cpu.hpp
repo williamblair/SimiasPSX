@@ -86,6 +86,9 @@ private:
     // execute a SLL operation (shift left)
     void op_sll(uint32_t instruction);
 
+	// execute an ADDIU operation (add immediate unsigned)
+	void op_addiu(uint32_t instruction);
+
     uint32_t registers[32]; // 32 bit pc -> 32 registers -> 5 bits for specifying register
     uint32_t pc; // program counter
     Interconnect interconnect; // maps between cpu and bios
