@@ -50,34 +50,34 @@ void Interconnect::store32(uint32_t addr, uint32_t val)
             throw e;
         }
         
-        // make sure the setting address is in the proper range
-        if(addr < MEM_CONTROL || addr >= MEM_CONTROL + MEM_CONTROL_SIZE) {
-            sprintf(e, "Interconnect::store32: Out of range address 0x%X", addr);
-            throw e;
-        }
-        
         // calculate the offset from the start of the MEM_CONTROL area
         uint32_t offset = addr - MEM_CONTROL;
-        std::cout << "Interconnect::store32 Offset: " << offset << std::endl;
+        //std::cout << "Interconnect::store32 Offset: " << offset << std::endl;
         
-        switch(offset)
-        {
-            case 0:
-                if(val != 0x1f000000){
-                    sprintf(e, "Interconnect::store32: Bad expansion 1 base address: 0x%X", addr);
-                    throw e;
-                }
-                break;
-            case 4:
-                if(val != 0x1f802000){
-                    sprintf(e, "Interconnect::store32: Bad expansion 2 base address: 0x%X", addr);
-                    throw e;
-                }
-                break;
-            default:
-                sprintf(e, "Interconnect::store32: Unhandled write to MEM_CONTROL, address 0x%X", addr);
-                throw e;
-        }
+        if(addr >= MEM_CONTROL && addr <= MEM_CONTROL + MEM_CONTROL_SIZE) {	
+			switch(offset)
+			{
+				case 0:
+					if(val != 0x1f000000){
+						sprintf(e, "Interconnect::store32: Bad expansion 1 base address: 0x%X", addr);
+						throw e;
+					}
+					break;
+				case 4:
+					if(val != 0x1f802000){
+						sprintf(e, "Interconnect::store32: Bad expansion 2 base address: 0x%X", addr);
+						throw e;
+					}
+					break;
+				default:
+					std::cout << "Interconnect::store32: Warning: Unhandled write to MEM_CONTROL, address "
+						<< std::hex << addr << std::endl;
+					break;
+			}
+			
+			// done with the function now
+			return;
+		}
         
         // There will be more here later, it seems that for now we are fine...
         

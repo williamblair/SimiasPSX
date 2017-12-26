@@ -12,6 +12,11 @@
 const uint32_t MEM_CONTROL      = 0x1F801000;
 const uint32_t MEM_CONTROL_SIZE = 36;
 
+// 'Something to do with RAM configuration, not actually 
+// the amount of RAM'
+const uint32_t RAM_SIZE         = 0x1F801060;
+const uint32_t RAM_SIZE_SIZE    = 4;
+
 class Interconnect
 {
 public:

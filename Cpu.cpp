@@ -147,8 +147,6 @@ void Cpu::op_sw(uint32_t instruction)
     uint32_t addr = get_register((CPU_REGISTER)store) + i;
     uint32_t v    = get_register((CPU_REGISTER)reg);
     
-    std::cout << "Addr: " << std::hex << "0x" << addr << std::endl;
-    std::cout << "Value: " <<  std::hex << "0x" << v << std::endl;
     store32(addr, v);
 }
 
