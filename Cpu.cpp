@@ -15,6 +15,8 @@ Cpu::Cpu(Interconnect &interconnect)
     // the beginning of the BIOS
     this->pc = BIOS_START;
     
+    this->next_instruction = 0x0; // NOOP
+    
     // internal interconnect object
     this->interconnect = interconnect;
     
@@ -88,6 +90,12 @@ uint32_t Cpu::imm_se(uint32_t instruction)
     int16_t v = (int16_t)(instruction & 0xffff);
     
     return (uint32_t)v;
+}
+
+// bits 25:0
+uint32_t Cpu::imm_jump(uint32_t instruction)
+{
+    return instruction & 0x3FFFFFF;
 }
 
 // bits 15:11
@@ -175,6 +183,29 @@ void Cpu::op_addiu(uint32_t instruction)
 	set_register((CPU_REGISTER)reg, val);
 }
 
+void Cpu::op_j(uint32_t instruction)
+{
+    uint32_t i = imm_jump(instruction);
+    
+    pc = (pc & 0xF0000000) | (i << 2);
+    
+    return;
+}
+
+void Cpu::op_or(uint32_t instruction)
+{
+    uint32_t reg = d(instruction);
+    uint32_t val1 = s(instruction);
+    uint32_t val2 = t(instruction);
+    
+    uint32_t result = get_register((CPU_REGISTER)val1) |
+                      get_register((CPU_REGISTER)val2);
+                      
+    set_register((CPU_REGISTER)reg, result);
+    
+    return;
+}
+
 /************************************************/
 /**            EXECUTION FUNCTIONS             **/
 /************************************************/
@@ -217,6 +248,9 @@ void Cpu::decode_and_execute(uint32_t instruction)
                     case 0b000000:
                         op_sll(instruction);
                         break;
+                    case 0b100101:
+                        op_or(instruction);
+                        break;
                     default:
                         std::cerr << "Cpu::decode_and_execute: NOOP (0b000000): unhandled subfunction\n";
                         throw subfunction(instruction);
@@ -238,6 +272,10 @@ void Cpu::decode_and_execute(uint32_t instruction)
 				std::cout << "0b001001 (addiu) case!\n";
 				op_addiu(instruction);
 				break;
+            case 0b000010:
+                std::cout << "0b000010 (J) case!\n";
+                op_j(instruction);
+                break;
             default:
                 throw instruction;
             //    break;
@@ -260,7 +298,13 @@ void Cpu::run_next_instruction(void)
 {
     // get the code to run
     // requires pc but we don't have to send it as an arg
-    uint32_t instruction = this->load32(pc);
+    //uint32_t instruction = this->load32(pc);
+    
+    // use previously loaded instruction
+    uint32_t instruction = next_instruction;
+    
+    // get the next instruction at PC
+    next_instruction = this->load32(pc);
     
     // get the next instruction
     // on overflow this should restart at 0, which c automatically does

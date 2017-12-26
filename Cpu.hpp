@@ -70,6 +70,8 @@ private:
     uint32_t imm(uint32_t instruction);
     // returns the immediate value in 16 bits as a sign-extended 32 bit value
     uint32_t imm_se(uint32_t instruction);
+    // returns the immmediate value in bits 25:0 - for jump instruction
+    uint32_t imm_jump(uint32_t instruction);
     uint32_t d(uint32_t instruction);
     uint32_t subfunction(uint32_t instruction);
     uint32_t shift(uint32_t instruction);
@@ -88,9 +90,16 @@ private:
 
 	// execute an ADDIU operation (add immediate unsigned)
 	void op_addiu(uint32_t instruction);
+    
+    // execute a J operation (jump - change the pc to a specified value)
+    void op_j(uint32_t instruction);
+    
+    // execute an OR operation
+    void op_or(uint32_t instruction);
 
     uint32_t registers[32]; // 32 bit pc -> 32 registers -> 5 bits for specifying register
     uint32_t pc; // program counter
+    uint32_t next_instruction; // next instruction to be executed (branch delay slot)
     Interconnect interconnect; // maps between cpu and bios
 };
 
