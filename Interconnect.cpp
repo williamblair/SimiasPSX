@@ -54,7 +54,9 @@ void Interconnect::store32(uint32_t addr, uint32_t val)
         uint32_t offset = addr - MEM_CONTROL;
         //std::cout << "Interconnect::store32 Offset: " << offset << std::endl;
         
-        if(addr >= MEM_CONTROL && addr <= MEM_CONTROL + MEM_CONTROL_SIZE) {	
+        // MEM_CONTROL memory range
+        if(addr >= MEM_CONTROL && addr <= MEM_CONTROL + MEM_CONTROL_SIZE)
+        {	
 			switch(offset)
 			{
 				case 0:
@@ -75,6 +77,17 @@ void Interconnect::store32(uint32_t addr, uint32_t val)
 					break;
 			}
 			
+			// done with the function now
+			return;
+		}
+		
+		// RAM Config memory range
+		if(addr >= RAM_SIZE && addr <= RAM_SIZE + RAM_SIZE_SIZE)
+		{
+			// do nothing for now
+			std::cout << "Interconnect::store32: Warning: Unhandled write to RAM_SIZE, address "
+				<< std::hex << addr << std::endl;
+				
 			// done with the function now
 			return;
 		}
