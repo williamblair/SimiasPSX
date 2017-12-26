@@ -51,12 +51,15 @@ void Interconnect::store32(uint32_t addr, uint32_t val)
         }
         
         // calculate the offset from the start of the MEM_CONTROL area
-        uint32_t offset = addr - MEM_CONTROL;
+        //uint32_t offset = addr - MEM_CONTROL;
         //std::cout << "Interconnect::store32 Offset: " << offset << std::endl;
         
         // MEM_CONTROL memory range
         if(addr >= MEM_CONTROL && addr <= MEM_CONTROL + MEM_CONTROL_SIZE)
-        {	
+        {
+            // calculate the offset from the start of the MEM_CONTROL area
+            uint32_t offset = addr - MEM_CONTROL;
+            	
 			switch(offset)
 			{
 				case 0:
@@ -91,6 +94,17 @@ void Interconnect::store32(uint32_t addr, uint32_t val)
 			// done with the function now
 			return;
 		}
+        
+        // CACHE_CONTROL memory range
+        if(addr >= CACHE_CONTROL && addr <= CACHE_CONTROL + CACHE_CONTROL_SIZE) 
+        {
+            // do nothing for now
+            std::cout << "Interconnect::store32: Warning: Unhandled write to CACHE_CONTROL, address "
+                << std::hex << addr << std::endl;
+                
+            // done with the function now
+            return;
+        }
         
         // There will be more here later, it seems that for now we are fine...
         

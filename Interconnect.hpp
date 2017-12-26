@@ -17,6 +17,9 @@ const uint32_t MEM_CONTROL_SIZE = 36;
 const uint32_t RAM_SIZE         = 0x1F801060;
 const uint32_t RAM_SIZE_SIZE    = 4;
 
+const uint32_t CACHE_CONTROL      = 0xFFFE0130;
+const uint32_t CACHE_CONTROL_SIZE = 4;
+
 class Interconnect
 {
 public:
