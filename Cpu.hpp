@@ -95,6 +95,10 @@ private:
     // execute an ADDIU operation (add immediate unsigned)
     void op_addiu(uint32_t instruction);
     
+    // execute an ADDI operation (add immediate - this one generates an
+    // exception upon overflow)
+    void op_addi(uint32_t instruction);
+    
     // execute a J operation (jump - change the pc to a specified value)
     void op_j(uint32_t instruction);
     

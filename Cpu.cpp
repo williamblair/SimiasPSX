@@ -4,6 +4,7 @@
 #include "Bios.hpp"
 
 #include <bitset>
+#include <climits> // to check of addition will result in overflow (ADDI)
 
 /************************************************/
 /**              CONSTRUCTOR                   **/
@@ -191,6 +192,29 @@ void Cpu::op_addiu(uint32_t instruction)
     set_register((CPU_REGISTER)reg, val);
 }
 
+void Cpu::op_addi(uint32_t instruction)
+{
+    int32_t i     = (int32_t)imm_se(instruction);
+    uint32_t reg   = t(instruction);
+    //uint32_t store = s(instruction);
+    
+    // get the value at the given register
+    int32_t val = (int32_t)get_register((CPU_REGISTER)reg);
+    
+    // check if addition will result in overflow
+    if(val > INT32_MAX - i) {
+        std::cerr << "Cpu::op_addi: exception: addition will result in overflow!\n";
+        std::cerr << "    Values: " << val << ", " << i << ", max is " << INT32_MAX
+            << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    
+    // otherwise add the value
+    val += i;
+    
+    set_register((CPU_REGISTER)reg, (uint32_t)val);
+}
+
 void Cpu::op_j(uint32_t instruction)
 {
     uint32_t i = imm_jump(instruction);
@@ -359,6 +383,10 @@ void Cpu::decode_and_execute(uint32_t instruction)
             case 0b101011:
                 std::cout << "0b101011 (sw) case!\n";
                 op_sw(instruction);
+                break;
+            case 0b001000:
+                std::cout << "0b001000 (addi) case!\n";
+                op_addi(instruction);
                 break;
             case 0b001001:
                 std::cout << "0b001001 (addiu) case!\n";
