@@ -96,10 +96,17 @@ private:
     
     // execute an OR operation
     void op_or(uint32_t instruction);
+    
+    // execute a coprocessor 0 (cop0) instruction
+    void op_cop0(uint32_t instruction);
+    
+    // COP0 instructions
+    void cop0_mtc0(uint32_t instruction);
 
     uint32_t registers[32]; // 32 bit pc -> 32 registers -> 5 bits for specifying register
     uint32_t pc; // program counter
     uint32_t next_instruction; // next instruction to be executed (branch delay slot)
+    uint32_t sr;               // status register
     Interconnect interconnect; // maps between cpu and bios
 };
 

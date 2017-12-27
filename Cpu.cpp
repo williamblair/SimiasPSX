@@ -17,6 +17,8 @@ Cpu::Cpu(Interconnect &interconnect)
     
     this->next_instruction = 0x0; // NOOP
     
+    this->sr = 0;
+    
     // internal interconnect object
     this->interconnect = interconnect;
     
@@ -148,6 +150,12 @@ void Cpu::op_ori(uint32_t instruction)
 // store 32 bits at a specific register into another register
 void Cpu::op_sw(uint32_t instruction)
 {
+    // don't write if the cache is islocated
+    if((this->sr & 0x10000) != 0) {
+        std::cout << "Cpu::op_sw: Cache is isolated; ignoring write\n";
+        return;
+    }
+    
     uint32_t i     = imm_se(instruction);
     uint32_t reg   = t(instruction);
     uint32_t store = s(instruction);
@@ -173,14 +181,14 @@ void Cpu::op_sll(uint32_t instruction)
 
 void Cpu::op_addiu(uint32_t instruction)
 {
-	uint32_t i     = imm_se(instruction);
-	uint32_t reg   = t(instruction);
-	uint32_t store = s(instruction);
-	
-	// would use wrapping add here but c will wrap for us
-	uint32_t val = get_register((CPU_REGISTER)reg) + i;
-	
-	set_register((CPU_REGISTER)reg, val);
+    uint32_t i     = imm_se(instruction);
+    uint32_t reg   = t(instruction);
+    //uint32_t store = s(instruction);
+    
+    // would use wrapping add here but c will wrap for us
+    uint32_t val = get_register((CPU_REGISTER)reg) + i;
+    
+    set_register((CPU_REGISTER)reg, val);
 }
 
 void Cpu::op_j(uint32_t instruction)
@@ -202,6 +210,55 @@ void Cpu::op_or(uint32_t instruction)
                       get_register((CPU_REGISTER)val2);
                       
     set_register((CPU_REGISTER)reg, result);
+    
+    return;
+}
+
+void Cpu::op_cop0(uint32_t instruction)
+{
+    // Simias has this as a different function (cop_opcode), but 
+    // says it returns the same thing as s except instead of a cpu register
+    // it's a u32 value
+    uint32_t cop_opcode = s(instruction);
+    switch(cop_opcode)
+    {
+        case 0b00100:
+            std::cout << "op_cop0: MTC0 (move to coprocessor 0) case!\n";
+            cop0_mtc0(instruction);
+            break;
+        
+        default:
+            std::cerr << "Cpu::op_cop0: unhandled cop0 instruction function: "
+                << std::hex << cop_opcode << std::endl;
+            exit(EXIT_FAILURE);
+    }
+    
+    return;
+}
+
+/************************************************/
+/**             COP0 INSTRUCTIONS              **/
+/************************************************/
+
+void Cpu::cop0_mtc0(uint32_t instruction)
+{
+    uint32_t cpu_r = t(instruction);
+    uint32_t cop_r = d(instruction);
+    
+    uint32_t v = get_register((CPU_REGISTER)cpu_r);
+    
+    // now write to the appropriate cop0 register
+    switch(cop_r)
+    {
+        case 12:
+            std::cout << "cop0_mtc0: register 12 (SR) write!\n";
+            this->sr = v;
+            break;
+        default:
+            std::cerr << "Cpu::cop0_mtc0: Unhandled cop0 register: "
+                << std::hex << cop_r << std::endl;
+            exit(EXIT_FAILURE);
+    }
     
     return;
 }
@@ -256,6 +313,10 @@ void Cpu::decode_and_execute(uint32_t instruction)
                         throw subfunction(instruction);
                 }
                 break;
+            case 0b010000:
+                std::cout << "0b010000 (cop0) case!\n";
+                op_cop0(instruction);
+                break;
             case 0b001111:
                 std::cout << "0b001111 (LUI) case!\n";
                 op_lui(instruction);
@@ -269,9 +330,9 @@ void Cpu::decode_and_execute(uint32_t instruction)
                 op_sw(instruction);
                 break;
             case 0b001001:
-				std::cout << "0b001001 (addiu) case!\n";
-				op_addiu(instruction);
-				break;
+                std::cout << "0b001001 (addiu) case!\n";
+                op_addiu(instruction);
+                break;
             case 0b000010:
                 std::cout << "0b000010 (J) case!\n";
                 op_j(instruction);
