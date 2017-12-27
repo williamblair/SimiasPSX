@@ -59,6 +59,10 @@ public:
 
 private:
 
+    // moves the pc by the given offset and adjusts for the 
+    // run_next_instruction look ahead
+    void branch(uint32_t offset);
+
     // parses the instruction for the required bits for each piece of data
     // function - the instruction type (LUI, etc.) (bits 31:26)
     // s - which value to store into? (bits 25:21)
@@ -88,8 +92,8 @@ private:
     // execute a SLL operation (shift left)
     void op_sll(uint32_t instruction);
 
-	// execute an ADDIU operation (add immediate unsigned)
-	void op_addiu(uint32_t instruction);
+    // execute an ADDIU operation (add immediate unsigned)
+    void op_addiu(uint32_t instruction);
     
     // execute a J operation (jump - change the pc to a specified value)
     void op_j(uint32_t instruction);
@@ -99,6 +103,9 @@ private:
     
     // execute a coprocessor 0 (cop0) instruction
     void op_cop0(uint32_t instruction);
+    
+    // execute a BNE (branch if not equal) instruction
+    void op_bne(uint32_t instruction);
     
     // COP0 instructions
     void cop0_mtc0(uint32_t instruction);

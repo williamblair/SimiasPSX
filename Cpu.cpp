@@ -236,6 +236,20 @@ void Cpu::op_cop0(uint32_t instruction)
     return;
 }
 
+void Cpu::op_bne(uint32_t instruction)
+{
+    uint32_t i     = imm_se(instruction);
+    uint32_t store = s(instruction);
+    uint32_t reg   = t(instruction);
+    
+    // if the values are not equal, branch with given offset i
+    if(get_register((CPU_REGISTER)store) != get_register((CPU_REGISTER)reg)){
+        this->branch(i);
+    }
+    
+    return;
+}
+
 /************************************************/
 /**             COP0 INSTRUCTIONS              **/
 /************************************************/
@@ -266,6 +280,23 @@ void Cpu::cop0_mtc0(uint32_t instruction)
 /************************************************/
 /**            EXECUTION FUNCTIONS             **/
 /************************************************/
+
+// adjust the PC based on the given offset
+void Cpu::branch(uint32_t offset)
+{
+    // offset immediates are always shifted 2 places
+    // to the right since PC addresses have to be aligned
+    // on 32 bits at all times
+    offset = offset << 2;
+    
+    pc += offset;
+    
+    // need to compensate for the hardcoded 'pc += 4'
+    // in run_next_instruction
+    pc -= 4;
+    
+    return;
+}
 
 // load the 32 bit value from the given address
 uint32_t Cpu::load32(const uint32_t address)
@@ -336,6 +367,10 @@ void Cpu::decode_and_execute(uint32_t instruction)
             case 0b000010:
                 std::cout << "0b000010 (J) case!\n";
                 op_j(instruction);
+                break;
+            case 0b000101:
+                std::cout << "0b000101 (BNE) case!\n";
+                op_bne(instruction);
                 break;
             default:
                 throw instruction;
