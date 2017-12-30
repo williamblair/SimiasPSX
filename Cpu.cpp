@@ -3,6 +3,7 @@
 #include "Cpu.hpp"
 #include "Bios.hpp"
 
+#include <cstring>
 #include <bitset>
 #include <climits> // to check of addition will result in overflow (ADDI)
 
@@ -20,16 +21,20 @@ Cpu::Cpu(Interconnect &interconnect)
     
     this->sr = 0;
     
+    this->load[0] = this->load[1] = 0;
+    
     // internal interconnect object
     this->interconnect = interconnect;
     
     // set the initial register values
     registers[0] = 0; // the first register equals the $zero register
+    out_registers[0] = 0;
     
     // don't know what the reset values for these
     // registers are, so we give them a dummy placeholder
     for(int i=1; i<32; i++){
         registers[i] = 0xdeadbeef;
+        out_registers[i] = 0xdeadbeef;
     }
 }
 
@@ -42,7 +47,8 @@ bool Cpu::set_register(CPU_REGISTER r, uint32_t val)
     bool ret_val = true;
     
     if(r != REG_ZERO) {
-        registers[r] = val;
+        //registers[r] = val;
+        out_registers[r] = val;
     }
     else {
         std::cerr << "Cpu::set_register: cannot set REG_ZERO!\n";
@@ -274,6 +280,29 @@ void Cpu::op_bne(uint32_t instruction)
     return;
 }
 
+void Cpu::op_lw(uint32_t instruction)
+{
+    // check for isolated cache
+    if((this->sr & 0x10000) != 0) {
+        // cache is isolated, ignore load
+        std::cout << "Cpu::op_lw: cache isolated, ignoring load\n";
+        return;
+    }
+    
+    uint32_t i   = imm_se(instruction);
+    uint32_t reg1 = t(instruction);
+    uint32_t reg2 = s(instruction);
+    
+    uint32_t addr = get_register((CPU_REGISTER)reg2) + i;
+    
+    uint32_t val = load32(addr);
+    
+    //set_register((CPU_REGISTER)reg1, val);
+    this->load[0] = reg1; this->load[1] = val;
+    
+    return;
+}
+
 /************************************************/
 /**             COP0 INSTRUCTIONS              **/
 /************************************************/
@@ -400,6 +429,10 @@ void Cpu::decode_and_execute(uint32_t instruction)
                 std::cout << "0b000101 (BNE) case!\n";
                 op_bne(instruction);
                 break;
+            case 0b100011:
+                std::cout << "0b100011 (LW) case!\n";
+                op_lw(instruction);
+                break;
             default:
                 throw instruction;
             //    break;
@@ -430,6 +463,14 @@ void Cpu::run_next_instruction(void)
     // get the next instruction at PC
     next_instruction = this->load32(pc);
     
+    // execute a pending load (if any, otherwise loads $zero which
+    // is a NOP)
+    uint32_t reg = load[0]; uint32_t val = load[1];
+    this->set_register((CPU_REGISTER)reg, val);
+    
+    // reset load to default to $zero (NOP)
+    load[0] = load[1] = 0; 
+    
     // get the next instruction
     // on overflow this should restart at 0, which c automatically does
     // i.e. 0xfffffffc + 4 => 0x00000000
@@ -437,5 +478,8 @@ void Cpu::run_next_instruction(void)
     
     // run the instruction
     decode_and_execute(instruction);
+    
+    // copy the output registers as input for the next instruction
+    std::memcpy(registers, out_registers, sizeof(uint32_t)*32);
 }
 

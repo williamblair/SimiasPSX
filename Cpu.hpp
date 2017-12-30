@@ -111,10 +111,15 @@ private:
     // execute a BNE (branch if not equal) instruction
     void op_bne(uint32_t instruction);
     
+    // execute a LW (load word) instruction
+    void op_lw(uint32_t instruction);
+    
     // COP0 instructions
     void cop0_mtc0(uint32_t instruction);
 
     uint32_t registers[32]; // 32 bit pc -> 32 registers -> 5 bits for specifying register
+    uint32_t out_registers[32]; // the actual, final values after an instruction (for load delay slots)
+    uint32_t load[2]; // load initiated by the current instruction - register and value
     uint32_t pc; // program counter
     uint32_t next_instruction; // next instruction to be executed (branch delay slot)
     uint32_t sr;               // status register
