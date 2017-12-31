@@ -5,12 +5,18 @@
 #include <iomanip>
  
 #include "Bios.hpp"
+#include "Ram.hpp"
 
 #ifndef INTERCONNECT_H_INCLUDED
 #define INTERCONNECT_H_INCLUDED
 
+// Memory control location
 const uint32_t MEM_CONTROL      = 0x1F801000;
 const uint32_t MEM_CONTROL_SIZE = 36;
+
+// RAM location (amount because RAM_SIZE is a register)
+const uint32_t RAM = 0xA0000000;
+const uint32_t RAM_AMOUNT = 2 * 1024 * 1024;
 
 // 'Something to do with RAM configuration, not actually 
 // the amount of RAM'
@@ -35,6 +41,7 @@ public:
 
 private:
     Bios bios;
+    Ram ram;
 };
 
 #endif

@@ -19,13 +19,30 @@ uint32_t Interconnect::load32(const uint32_t address)
             sprintf(e, "Interconnect::load32: Unaligned fetch32 at address 0x%X", address);
             throw e;
         }
-        else if(!bios.contains(address)){
+        /*else if(!bios.contains(address)){
             char e[100];
             sprintf(e, "Interconnect::load32: invalid fetch32 at address 0x%X", address);
             throw e;
         }
         // return the offset within the start of the bios
-        instruction = bios.load32(address - BIOS_START);
+        instruction = bios.load32(address - BIOS_START);*/
+        
+        // Load from bios
+        if(bios.contains(address)){
+            instruction = bios.load32(address - BIOS_START);
+        }
+        
+        // Load from RAM
+        else if(ram.contains(address)){
+            instruction = ram.load32(address - RAM_START);
+        }
+        
+        // unhandled memory read, throw an exception
+        else {
+            char e[100];
+            sprintf(e, "Interconnect::load32: invalid fetch32 at address 0x%X", address);
+            throw e;
+        }
         
     }
     catch(const char* exception)
@@ -100,6 +117,17 @@ void Interconnect::store32(uint32_t addr, uint32_t val)
         {
             // do nothing for now
             std::cout << "Interconnect::store32: Warning: Unhandled write to CACHE_CONTROL, address "
+                << std::hex << addr << std::endl;
+                
+            // done with the function now
+            return;
+        }
+        
+        // RAM memory range
+        if(addr >= RAM && addr <= RAM + RAM_AMOUNT)
+        {
+            // do nothing for now
+            std::cout << "Interconnect::store32: Warning: Unhandled write to RAM, address "
                 << std::hex << addr << std::endl;
                 
             // done with the function now
