@@ -7,3 +7,5 @@ Debug
 SimiasPSX.mk
 SCPH1001.BIN
 main.exe
+*.o
+
