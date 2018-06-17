@@ -1,5 +1,6 @@
 #include "Cpu.hpp"
 #include "Bios.hpp"
+#include "Interconnect.hpp"
 
 #include <iostream>
 #include <vector>
@@ -13,13 +14,18 @@ int main(int argc, char *argv[])
     }
 
     /* Get each instance */
-    static Cpu  *cpu  = Cpu::getInstance();    
-    static Bios *bios = Bios::getInstance();
+    static Cpu          *cpu          = Cpu::getInstance();    
+    static Bios         *bios         = Bios::getInstance();
+    static Interconnect *interconnect = Interconnect::getInstance();
 
     /* Open the bios */
     if (!(bios->load(std::string(argv[1])))) {
         return -1;
     }
+
+    /* Connect the Bios and Cpu */
+    interconnect->setBios(bios);
+    interconnect->setCpu(cpu);
 
     return 0;
 }
