@@ -1,7 +1,8 @@
 # psx emulator makefile
 
 BIN  = main
-OBJS = build/main.o build/Cpu.o build/Bios.o build/Interconnect.o
+OBJS = build/main.o build/Cpu.o build/Bios.o build/Interconnect.o \
+       build/Range.o
 
 CC     = g++
 CFLAGS = -g -Wall -std=c++11 

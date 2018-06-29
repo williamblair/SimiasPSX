@@ -3,6 +3,7 @@
 Bios *Bios::m_Bios = NULL;
 
 Bios::Bios(void)
+: m_Range(BIOS_MEM_START, BIOS_MEM_LENGTH)
 {
 }
 

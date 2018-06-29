@@ -9,4 +9,5 @@ SCPH1001.BIN
 main.exe
 main
 *.o
+.vscode
 
