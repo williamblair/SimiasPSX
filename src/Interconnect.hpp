@@ -20,6 +20,9 @@ public:
     /* Map the given address to its location
      * e.g. Bios etc. */
     uint32_t load32(uint32_t addr);
+    
+    /* Map and store the given value into the given address */
+    void store32(uint32_t addr, uint32_t value);
 
     /* Set our member pointers */
     void setBios(Bios *bios);
@@ -31,6 +34,9 @@ private:
 
     /* Pointers to the Bios instance */
     Bios *m_Bios;
+    
+    /* Memory control range */
+    Range MemControl;
 
     /* Singelton instance */
     static Interconnect *m_Interconnect;

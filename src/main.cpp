@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     }
 
     /* Get each instance */
-    static Cpu          *cpu          = Cpu::getInstance();    
+    static Cpu          *cpu          = Cpu::getInstance();
     static Bios         *bios         = Bios::getInstance();
     static Interconnect *interconnect = Interconnect::getInstance();
 
