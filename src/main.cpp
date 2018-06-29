@@ -23,9 +23,15 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    /* Connect the Bios and Cpu */
+    /* Connect the Bios and the Cpu */
     interconnect->setBios(bios);
-    interconnect->setCpu(cpu);
+    cpu->setInterconnect(interconnect);
+
+    /* Run the CPU! */
+    for(;;)
+    {
+        cpu->runNextInstruction();
+    }
 
     return 0;
 }

@@ -13,7 +13,6 @@ Interconnect *Interconnect::getInstance(void)
 Interconnect::Interconnect(void)
 {
     m_Bios = NULL;
-    m_Cpu  = NULL;
 }
 
 Interconnect::~Interconnect(void)
@@ -25,9 +24,20 @@ void Interconnect::setBios(Bios *bios)
     m_Bios = bios;
 }
 
-void Interconnect::setCpu(Cpu *cpu)
+uint32_t Interconnect::load32(uint32_t addr)
 {
-    m_Cpu = cpu;
+    if (m_Bios->contains(addr)) {
+        uint32_t offset = m_Bios->offset(addr);
+        return m_Bios->load32(offset);
+    }
+
+    /* Unhandled address so far, throw it! */
+    else {
+        std::stringstream ss;
+        ss << "Interconnect::load32: unhandled address: ";
+        ss << std::hex << addr;
+        throw ss.str();
+    }
 }
 
 

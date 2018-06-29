@@ -23,6 +23,16 @@ Bios *Bios::getInstance(void)
     return m_Bios;
 }
 
+bool Bios::contains(uint32_t addr)
+{
+    return m_Range.contains(addr);
+}
+
+uint32_t Bios::offset(uint32_t addr)
+{
+    return m_Range.offset(addr);
+}
+
 uint32_t Bios::load32(uint32_t offset)
 {
     if (!m_Data) {

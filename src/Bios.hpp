@@ -28,14 +28,20 @@ public:
     /* Load the bios file into memory */
     bool load(std::string fileName);
 
-private:
+    /* Test if the given address is within bios mem */
+    bool contains(uint32_t addr);
 
-    /* Constructor */
-    Bios(void);
+    /* Return the offset in the internal range */
+    uint32_t offset(uint32_t addr);
 
     /* Convert the bios data at the given offset
      * to little endian and return it */
     uint32_t load32(uint32_t offset);
+
+private:
+
+    /* Constructor */
+    Bios(void);
 
     /* Our loaded bios in memory */
     uint8_t *m_Data;

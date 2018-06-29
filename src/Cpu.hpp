@@ -1,3 +1,5 @@
+#include "Interconnect.hpp"
+
 #include <iostream>
 #include <cstdint>
 
@@ -14,9 +16,12 @@ public:
     /* Get the CPU instance */
     static Cpu *getInstance(void);    
 
+    /* Set the interconnect */
+    void setInterconnect(Interconnect *i);
+
     /* Get the instruction at PC, run it,
      * and increment the PC */
-    void run_next_instruction(void);
+    void runNextInstruction(void);
     
 private:
     
@@ -24,13 +29,16 @@ private:
     Cpu(void);
 
     /* Get the instruction from memory based on the PC */
-    uint32_t load32(void);
+    uint32_t load32(uint32_t addr);
 
     /* Parse the instruction and run it */
     void decode_and_execute(uint32_t instruction);
      
     /* Program Counter */
     uint32_t m_PC;
+
+    /* Interconnect */
+    Interconnect *m_Interconnect;
     
     /* The singleton instance */
     static Cpu *m_Cpu;

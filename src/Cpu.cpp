@@ -14,6 +14,8 @@ Cpu::Cpu(void)
 {
     /* Starting PC address of the PSX */
     m_PC = 0xBFC00000;
+
+    m_Interconnect = NULL;
 }
 
 Cpu::~Cpu(void)
@@ -21,10 +23,15 @@ Cpu::~Cpu(void)
     
 }
 
-void Cpu::run_next_instruction(void)
+void Cpu::setInterconnect(Interconnect *i)
+{
+    m_Interconnect = i;
+}
+
+void Cpu::runNextInstruction(void)
 {
     /* Get the instruction at the current program counter */
-    uint32_t instruction = load32();
+    uint32_t instruction = load32(m_PC);
 
     /* Increment the PC. In other languages we'd
      * have to make sure the PC moves back to 0 on 
@@ -35,16 +42,18 @@ void Cpu::run_next_instruction(void)
     decode_and_execute(instruction);
 }
 
-// TODO
-uint32_t Cpu::load32(void)
+uint32_t Cpu::load32(uint32_t addr)
 {
-    return 1;
+    return m_Interconnect->load32(addr);
 }
 
-// TODO
 void Cpu::decode_and_execute(uint32_t instruction)
 {
-    return;
+    std::stringstream ss;
+    ss << "Cpu::decode_and_execute: unhandled instruction: ";
+    ss << std::hex << instruction << "\n";
+    printf(ss.str().c_str());
+    exit(0);
 }
 
 
