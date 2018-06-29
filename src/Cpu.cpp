@@ -49,11 +49,8 @@ uint32_t Cpu::load32(uint32_t addr)
 
 void Cpu::decode_and_execute(uint32_t instruction)
 {
-    std::stringstream ss;
-    ss << "Cpu::decode_and_execute: unhandled instruction: ";
-    ss << std::hex << instruction << "\n";
-    printf(ss.str().c_str());
-    exit(0);
+    quitWithMessage("Cpu::decode_and_execute: unhandled instruction",
+        instruction);
 }
 
 

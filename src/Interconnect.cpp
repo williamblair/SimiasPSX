@@ -26,18 +26,20 @@ void Interconnect::setBios(Bios *bios)
 
 uint32_t Interconnect::load32(uint32_t addr)
 {
+    uint32_t instruction = 0;
+
     if (m_Bios->contains(addr)) {
         uint32_t offset = m_Bios->offset(addr);
-        return m_Bios->load32(offset);
+        instruction = m_Bios->load32(offset);
     }
 
-    /* Unhandled address so far, throw it! */
+    /* Unhandled address so far so halt */
     else {
-        std::stringstream ss;
-        ss << "Interconnect::load32: unhandled address: ";
-        ss << std::hex << addr;
-        throw ss.str();
+        quitWithMessage("Interconnect::load32: unhandled address",
+            addr);
     }
+
+    return instruction;
 }
 
 

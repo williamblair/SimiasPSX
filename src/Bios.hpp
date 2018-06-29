@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "Range.hpp"
+#include "Quit.hpp"
 
 #ifndef BIOS_H_INCLUDED
 #define BIOS_H_INCLUDED
