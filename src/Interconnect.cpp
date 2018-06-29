@@ -73,7 +73,7 @@ void Interconnect::store32(uint32_t addr, uint32_t value)
         
         /* TODO - update */
         else {
-            quitWithMessage("Interconnect::store32: unhandled MemControl addr", addr);
+            printf("Interconnect::store32: warning: unhandled write to mem control address: 0x%X\n", addr);
         }
     }
     

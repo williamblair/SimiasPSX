@@ -61,6 +61,15 @@ void Cpu::decodeAndExecute(uint32_t instruction)
     uint32_t function = Instruction::function(instruction);
     switch(function)
     {
+        /* For Secondary opcodes */
+        case 0b000000:
+            switch(Instruction::subfunction(instruction))
+            {
+                case 0b000000: op_sll(instruction);
+                break;
+            }
+            break;
+        
         case 0b001111: op_lui(instruction); break;
         case 0b001101: op_ori(instruction); break;
         case 0b101011: op_sw(instruction);  break;
@@ -72,15 +81,13 @@ void Cpu::decodeAndExecute(uint32_t instruction)
 
 void Cpu::setRegister(uint32_t index, uint32_t value)
 {
-    /* Can't set register 0 as its always 0 */
-    if (index > 0 && index < 32) {
+    
+    if (index < 32) {
         m_Registers[index] = value;
     }
     
-    /* Give a warning otherwise */
-    else {
-        printf("Cpu::setRegister: warning: invalid register index: 0x%8X\n", value);
-    }
+    /* Can't set register 0 as its always 0 */
+    m_Registers[0] = 0;
 }
 
 uint32_t Cpu::getRegister(uint32_t index)
@@ -130,12 +137,26 @@ void Cpu::op_ori(uint32_t instruction)
 /* Store Word */
 void Cpu::op_sw(uint32_t instruction)
 {
-    uint32_t i = Instruction::imm(instruction);
+    /* Store the contents of $t at the specified address plus an offset (i) 
+     * The offset should be treated as a signed 16bit twos complement (so you
+     * can have a negative offset) */
+    uint32_t i = Instruction::imm_se(instruction);
     uint32_t t = Instruction::rt(instruction);
     uint32_t s = Instruction::rs(instruction);
     
-    /* Store the contents of $t at the specified address plus an offset (i) */
     uint32_t addr = getRegister(s) + i;
     uint32_t value = getRegister(t);
     store32(addr, value);
 }
+
+/* Shift Left Logical */
+void Cpu::op_sll(uint32_t instruction)
+{
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t d = Instruction::rd(instruction);
+    uint32_t i = Instruction::shift(instruction);
+    
+    uint32_t value = getRegister(t) << i;
+    setRegister(d, value);
+}
+
