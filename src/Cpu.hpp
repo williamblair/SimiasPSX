@@ -32,6 +32,7 @@ public:
     void op_sll(uint32_t instruction);
     void op_addiu(uint32_t instruction);
     void op_j(uint32_t instruction);
+    void op_or(uint32_t instruction);
     
 private:
     

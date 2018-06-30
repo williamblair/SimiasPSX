@@ -49,6 +49,9 @@ void Cpu::runNextInstruction(void)
     m_PC += 4;
 
     /* Run the previously loaded */
+    // DEBUG
+    printf("PC: 0x%08X    Instruction: 0x%08X\n", m_PC-8, instruction);
+    getchar();
     decodeAndExecute(instruction);
 }
 
@@ -71,8 +74,11 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b000000:
             switch(Instruction::subfunction(instruction))
             {
-                case 0b000000: op_sll(instruction);
-                break;
+                case 0b000000: op_sll(instruction); break;
+                case 0b100101: op_or(instruction);  break;
+                
+                default: quitWithInstruction("Cpu::decode_and_execute: unandled subfunction",
+                            instruction);
             }
             break;
         
@@ -190,3 +196,22 @@ void Cpu::op_j(uint32_t instruction)
      * two being used by the instruction identifier */
     m_PC = (m_PC & 0xF0000000) | (target << 2);
 }
+
+/* Or */
+void Cpu::op_or(uint32_t instruction)
+{
+    printf("In op or!\n");
+
+    uint32_t d = Instruction::rd(instruction);
+    uint32_t s = Instruction::rs(instruction);
+    uint32_t t = Instruction::rt(instruction);
+
+    /* ORs s and t and stores the result in d */
+    uint32_t value = getRegister(s) | getRegister(t);
+    setRegister(d, value);
+}
+
+
+
+
+

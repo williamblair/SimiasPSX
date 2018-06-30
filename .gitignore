@@ -6,6 +6,8 @@ Debug
 *.workspace
 SimiasPSX.mk
 SCPH1001.BIN
+SCPH7502.BIN
+*.asm
 main.exe
 main
 *.o

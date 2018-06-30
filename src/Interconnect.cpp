@@ -74,7 +74,7 @@ void Interconnect::store32(uint32_t addr, uint32_t value)
         
         /* TODO - update */
         else {
-            printf("Interconnect::store32: warning: unhandled write to mem control address: 0x%X\n", addr);
+            //printf("Interconnect::store32: warning: unhandled write to mem control address: 0x%X\n", addr);
         }
     }
     
@@ -83,10 +83,10 @@ void Interconnect::store32(uint32_t addr, uint32_t value)
         offset = RamSize.offset(addr);
         
         /* TODO - update */
-        printf("Interconnect::store32: warning: unhandled write to RamSize address: 0x%X\n", addr);
+        //printf("Interconnect::store32: warning: unhandled write to RamSize address: 0x%X\n", addr);
     }
     
     else {
-        printf("Interconnect::store32: warning: unhandled write to address: 0x%X\n", addr);
+        //printf("Interconnect::store32: warning: unhandled write to address: 0x%X\n", addr);
     }
 }
