@@ -61,12 +61,28 @@ void Cpu::store32(uint32_t addr, uint32_t value)
 {
     /* If the cache is isolated we won't write 
      * index 12 is the 'status register' */
-    if (m_Cop0Registers[12] & 0x00010000 != 0) {
-        printf("Cpu::store32: cache isloated, ignoring write\n");
+    if ((m_Cop0Registers[12] & 0x00010000) != 0) {
+        printf("Cpu::store32: cache isolated, ignoring write\n");
         return;
     }
     
     m_Interconnect->store32(addr, value);
+}
+
+void Cpu::branch(uint32_t offset)
+{
+    /* All offsets are shifted left by 2
+     * in order to keep the addresses 32bit
+     * aligned (shift 2 = times 4) */
+    offset <<= 2;
+
+    /* Branch by the offset */
+    m_PC += offset;
+
+    /* Compensate for the m_PC += 4 in runNextInstruction
+     * We won't combine it with the above
+     * so overflow can happen (I think...) */
+    m_PC -= 4;
 }
 
 void Cpu::decodeAndExecute(uint32_t instruction)
@@ -88,6 +104,8 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b101011: op_sw(instruction);    break;
         case 0b001001: op_addiu(instruction); break;
         case 0b000010: op_j(instruction);     break;
+        case 0b000101: op_bne(instruction);   break;
+
         case 0b010000: op_cop0(instruction);  break;
         
         default:       quitWithInstruction("Cpu::decode_and_execute: unhandled instruction",
@@ -224,6 +242,18 @@ void Cpu::op_j(uint32_t instruction)
      * way the target can have 28 bits instead of 26, the first
      * two being used by the instruction identifier */
     m_PC = (m_PC & 0xF0000000) | (target << 2);
+}
+
+/* Branch if Not Equal */
+void Cpu::op_bne(uint32_t instruction)
+{
+    uint32_t s = Instruction::rs(instruction);
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t imm = Instruction::imm_se(instruction);
+
+    if (getRegister(s) != getRegister(t)) {
+        branch(imm);
+    }
 }
 
 /* Coprocessor 0 instruction */

@@ -32,7 +32,9 @@ public:
     void op_sll(uint32_t instruction);
     void op_addiu(uint32_t instruction);
     void op_j(uint32_t instruction);
+    void op_bne(uint32_t instruction);
     
+    /* Coprocessor operations */
     void op_cop0(uint32_t instruction);
     void op_mtc0(uint32_t instruction);
     
@@ -61,6 +63,9 @@ private:
     
     /* Store a 32 bit value in memory */
     void store32(uint32_t addr, uint32_t value);
+
+    /* Used by jump ops (like j, bne, etc.) */
+    void branch(uint32_t offset);
      
     /* Program Counter */
     uint32_t m_PC;
