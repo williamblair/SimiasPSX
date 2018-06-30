@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 
+#include "Instruction.hpp"
 #include "Range.hpp"
 #include "Quit.hpp"
 

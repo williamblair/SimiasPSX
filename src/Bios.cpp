@@ -83,7 +83,28 @@ bool Bios::load(std::string fileName)
     m_Data = new uint8_t [BIOS_SIZE];
     file.read((char*)m_Data, BIOS_SIZE);
 
+    /* BJ DEBUG */
+    for(int offset = 0xBFC00000 - BIOS_MEM_START; offset < BIOS_SIZE - 4; offset += 4)
+    {
+        uint32_t instruction = load32(offset);
+        uint32_t opcode = Instruction::function(instruction);
+        uint32_t rs = Instruction::rs(instruction);
+        uint32_t rt = Instruction::rt(instruction);
+        uint32_t imm = Instruction::imm_se(instruction);
+        printf("0x%08X    0x%08X    Op: 0x%02X    rs: 0x%02X    rt: 0x%02X    imm: 0x%X\n", offset+BIOS_MEM_START, instruction, opcode, rs, rt, imm);
+    }
+
+    /*for (int i = 0; i < BIOS_SIZE; i++) {
+        printf("%02c ", m_Data[i]);
+        if (i != 0 && i % 8 == 0) {
+            printf("\n");
+        }
+    }*/
+
     file.close();
+
+    /* BJ DEBUG! */
+    exit(0);
 
     return true;
 }
