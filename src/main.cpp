@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    /* Connect the Bios and the Cpu and the RAM */
+    /* Connect the Bios and the Cpu */
     interconnect->setBios(bios);
     cpu->setInterconnect(interconnect);
 

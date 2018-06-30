@@ -22,10 +22,7 @@ Cpu::Cpu(void)
     
     /* Initialize the register values */
     std::memset(m_Registers, 0, sizeof(m_Registers));
-    std::memset(m_Cop0Registers, 0, sizeof(m_Cop0Registers));
-    std::memset(m_OutRegisters, 0, sizeof(m_OutRegisters));
-
-    m_Load[0] = m_Load[1] = 0;
+    
 }
 
 Cpu::~Cpu(void)
@@ -51,19 +48,8 @@ void Cpu::runNextInstruction(void)
      * overflow but C does that for us :) */
     m_PC += 4;
 
-    /* Execute the pending load
-     * first entry is the register, second entry is the value */
-    setRegister(m_Load[0], m_Load[1]);
-
-    /* Reset the load to a noop (move 0 to $0) */
-    m_Load[0] = m_Load[1] = 0;
-
     /* Run the previously loaded */
     decodeAndExecute(instruction);
-
-    /* Copy the output registers as input for the
-     * next instruction */
-    std::memcpy(m_Registers, m_OutRegisters, sizeof(m_Registers));
 }
 
 uint32_t Cpu::load32(uint32_t addr)
@@ -73,30 +59,7 @@ uint32_t Cpu::load32(uint32_t addr)
 
 void Cpu::store32(uint32_t addr, uint32_t value)
 {
-    /* If the cache is isolated we won't write 
-     * index 12 is the 'status register' */
-    if ((m_Cop0Registers[12] & 0x00010000) != 0) {
-        printf("Cpu::store32: cache isolated, ignoring write\n");
-        return;
-    }
-    
     m_Interconnect->store32(addr, value);
-}
-
-void Cpu::branch(uint32_t offset)
-{
-    /* All offsets are shifted left by 2
-     * in order to keep the addresses 32bit
-     * aligned (shift 2 = times 4) */
-    offset <<= 2;
-
-    /* Branch by the offset */
-    m_PC += offset;
-
-    /* Compensate for the m_PC += 4 in runNextInstruction
-     * We won't combine it with the above
-     * so overflow can happen (I think...) */
-    m_PC -= 4;
 }
 
 void Cpu::decodeAndExecute(uint32_t instruction)
@@ -118,11 +81,6 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b101011: op_sw(instruction);    break;
         case 0b001001: op_addiu(instruction); break;
         case 0b000010: op_j(instruction);     break;
-        case 0b000101: op_bne(instruction);   break;
-        case 0b001000: op_addi(instruction);  break;
-        case 0b100011: op_lw(instruction);    break;
-
-        case 0b010000: op_cop0(instruction);  break;
         
         default:       quitWithInstruction("Cpu::decode_and_execute: unhandled instruction",
                             instruction);
@@ -131,23 +89,13 @@ void Cpu::decodeAndExecute(uint32_t instruction)
 
 void Cpu::setRegister(uint32_t index, uint32_t value)
 {
-#if 0
+    
     if (index < 32) {
         m_Registers[index] = value;
     }
     
     /* Can't set register 0 as its always 0 */
     m_Registers[0] = 0;
-#endif
-
-    /* Target our out registers for load delay slots */
-    if (index < 32) {
-        m_OutRegisters[index] = value;
-    }
-
-    /* zero register always 0 */
-    m_OutRegisters[0] = 0;
-
 }
 
 uint32_t Cpu::getRegister(uint32_t index)
@@ -167,33 +115,6 @@ uint32_t Cpu::getRegister(uint32_t index)
     return regVal;
 }
 
-void Cpu::setCop0Register(uint32_t index, uint32_t value)
-{
-    if (index < 15) {
-        m_Cop0Registers[index] = value;
-    }
-    
-    /* Invalid! */
-    else {
-        quitWithInstruction("Cpu::setCop0Register: Invalid register", value);
-    }
-}
-
-uint32_t Cpu::getCop0Register(uint32_t index)
-{
-    uint32_t value = 0;
-    
-    if (index < 15) {
-        value = m_Cop0Registers[index];
-    }
-    
-    /* Invalid! */
-    else {
-        quitWithInstruction("Cpu::getCop0Register: Invalid register", index);
-    }
-    
-    return value;
-}
 
 /* Load Upper Immediate */
 void Cpu::op_lui(uint32_t instruction)
@@ -247,28 +168,6 @@ void Cpu::op_sll(uint32_t instruction)
     setRegister(d, value);
 }
 
-/* Add Immediate Unsigned and check for overflow */
-void Cpu::op_addi(uint32_t instruction)
-{
-    int32_t  imm = (int32_t) Instruction::imm_se(instruction);
-    uint32_t t   =           Instruction::rt(instruction);
-    uint32_t s   =           Instruction::rs(instruction);
-
-    /* Cast the s register value as signed int 32 */
-    int32_t si32 = (int32_t) getRegister(s);
-
-    /* If the difference is going to cause overflow,
-     * create an exception */
-    /*if (imm > (INT32_MAX - si32)) {
-        quitWithInstruction("Cpu::op_addi: addition overflow!",
-            instruction);
-    }*/
-
-    /* Otherwise add like normal */
-    uint32_t value = getRegister(s) + imm;
-    setRegister(t, value);
-}
-
 /* Add immediate unsigned (no overflow) */
 void Cpu::op_addiu(uint32_t instruction)
 {
@@ -291,65 +190,3 @@ void Cpu::op_j(uint32_t instruction)
      * two being used by the instruction identifier */
     m_PC = (m_PC & 0xF0000000) | (target << 2);
 }
-
-/* Branch if Not Equal */
-void Cpu::op_bne(uint32_t instruction)
-{
-    uint32_t s = Instruction::rs(instruction);
-    uint32_t t = Instruction::rt(instruction);
-    uint32_t imm = Instruction::imm_se(instruction);
-
-    if (getRegister(s) != getRegister(t)) {
-        branch(imm);
-    }
-}
-
-/* Load Word */
-void Cpu::op_lw(uint32_t instruction)
-{
-    uint32_t s = Instruction::rs(instruction);
-    uint32_t t = Instruction::rt(instruction);
-    uint32_t imm = Instruction::imm_se(instruction);
-
-    /* Make sure the cache isn't isolated */
-    if ((m_Cop0Registers[12] & 0x00010000) != 0) {
-        printf("Cpu::op_lw: cache isolated, ignoring looad\n");
-        return;
-    }
-
-    /* Load the value from memory with a given offset */
-    uint32_t addr = getRegister(s);
-    uint32_t value = load32(addr + imm);
-
-    /* Put the load in the delay slot */
-    m_Load[0] = addr; m_Load[1] = value;
-}
-
-/* Coprocessor 0 instruction */
-void Cpu::op_cop0(uint32_t instruction)
-{
-    /* Get which cop0 instruction it is */
-    uint32_t cop_opcode = Instruction::cop_opcode(instruction);
-    
-    switch (cop_opcode)
-    {
-        case 0b00100: op_mtc0(instruction); break;
-        
-        default: quitWithInstruction("Cpu::op_cop0: unhandled cop_opcode", cop_opcode);
-    }
-}
-
-/* Move To Coprocessor 0 */
-void Cpu::op_mtc0(uint32_t instruction)
-{
-    uint32_t t = Instruction::rt(instruction);
-    uint32_t d = Instruction::rd(instruction);
-    
-    /* Copy the contents of cpu register t into the coprocessor register d */
-    uint32_t value = getRegister(t);
-    setCop0Register(d, value);
-}
-
-
-
-

@@ -45,9 +45,4 @@ namespace Instruction {
     {
         return instruction & 0x3FFFFFF;
     }
-    
-    uint32_t cop_opcode(uint32_t instruction)
-    {
-        return (instruction >> 21) & 0x1F;
-    }
 }

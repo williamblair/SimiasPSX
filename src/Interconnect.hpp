@@ -32,7 +32,7 @@ private:
     /* Constructor */
     Interconnect(void);
 
-    /* Pointers to the Bios and RAM instance */
+    /* Pointers to the Bios instance */
     Bios *m_Bios;
     
     /* Memory control range */
@@ -40,9 +40,6 @@ private:
     
     /* RAM_SIZE memory range */
     Range RamSize;
-
-    /* CACHE_CONTROL memory range */
-    Range CacheControl;
 
     /* Singelton instance */
     static Interconnect *m_Interconnect;

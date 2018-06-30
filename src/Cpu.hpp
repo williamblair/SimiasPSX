@@ -30,15 +30,8 @@ public:
     void op_ori(uint32_t instruction);
     void op_sw (uint32_t instruction);
     void op_sll(uint32_t instruction);
-    void op_addi(uint32_t instruction);
     void op_addiu(uint32_t instruction);
     void op_j(uint32_t instruction);
-    void op_bne(uint32_t instruction);
-    void op_lw(uint32_t instruction);
-    
-    /* Coprocessor operations */
-    void op_cop0(uint32_t instruction);
-    void op_mtc0(uint32_t instruction);
     
 private:
     
@@ -57,17 +50,8 @@ private:
     /* Get a register value */
     uint32_t getRegister(uint32_t index);
     
-    /* Set a cop0 register */
-    void setCop0Register(uint32_t index, uint32_t value);
-    
-    /* Get a cop0 register */
-    uint32_t getCop0Register(uint32_t index);
-    
     /* Store a 32 bit value in memory */
     void store32(uint32_t addr, uint32_t value);
-
-    /* Used by jump ops (like j, bne, etc.) */
-    void branch(uint32_t offset);
      
     /* Program Counter */
     uint32_t m_PC;
@@ -78,22 +62,7 @@ private:
 
     /* General purpose registers */
     uint32_t m_Registers[32];
-    
-    /* Purely for us (the programmers) to handle
-     * loading delay slots */
-    uint32_t m_OutRegisters[32];
 
-    /* The current load initiated by the current
-     * instruction; for load delay slots
-     * first entry is the register, second entry is the value */
-    uint32_t m_Load[2];
-
-    /* Coprocessor 0 registers 
-     * Defined here: https://wiki.osdev.org/MIPS_Overview#Coprocessor_0_Registers 
-     * Most of these aren't actually used but its easier to be able to access
-     * the register numbers without any mapping to their index */
-    uint32_t m_Cop0Registers[15];
-    
     /* Interconnect */
     Interconnect *m_Interconnect;
     
