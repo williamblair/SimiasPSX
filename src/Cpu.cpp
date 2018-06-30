@@ -50,8 +50,8 @@ void Cpu::runNextInstruction(void)
 
     /* Run the previously loaded */
     // DEBUG
-    printf("PC: 0x%08X    Instruction: 0x%08X\n", m_PC-8, instruction);
-    getchar();
+    //printf("PC: 0x%08X    Instruction: 0x%08X\n", m_PC-8, instruction);
+    //getchar();
     decodeAndExecute(instruction);
 }
 
@@ -200,8 +200,6 @@ void Cpu::op_j(uint32_t instruction)
 /* Or */
 void Cpu::op_or(uint32_t instruction)
 {
-    printf("In op or!\n");
-
     uint32_t d = Instruction::rd(instruction);
     uint32_t s = Instruction::rs(instruction);
     uint32_t t = Instruction::rt(instruction);
