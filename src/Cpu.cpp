@@ -105,6 +105,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b001001: op_addiu(instruction); break;
         case 0b000010: op_j(instruction);     break;
         case 0b000101: op_bne(instruction);   break;
+        case 0b001000: op_addi(instruction);  break;
 
         case 0b010000: op_cop0(instruction);  break;
         
@@ -219,6 +220,28 @@ void Cpu::op_sll(uint32_t instruction)
     
     uint32_t value = getRegister(t) << i;
     setRegister(d, value);
+}
+
+/* Add Immediate Unsigned and check for overflow */
+void Cpu::op_addi(uint32_t instruction)
+{
+    int32_t  imm = (int32_t) Instruction::imm_se(instruction);
+    uint32_t t   =           Instruction::rt(instruction);
+    uint32_t s   =           Instruction::rs(instruction);
+
+    /* Cast the s register value as signed int 32 */
+    int32_t si32 = (int32_t) getRegister(s);
+
+    /* If the difference is going to cause overflow,
+     * create an exception */
+    if (imm > (INT32_MAX - si32)) {
+        quitWithInstruction("Cpu::op_addi: addition overflow!",
+            instruction);
+    }
+
+    /* Otherwise add like normal */
+    uint32_t value = getRegister(s) + imm;
+    setRegister(t, value);
 }
 
 /* Add immediate unsigned (no overflow) */

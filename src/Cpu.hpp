@@ -30,6 +30,7 @@ public:
     void op_ori(uint32_t instruction);
     void op_sw (uint32_t instruction);
     void op_sll(uint32_t instruction);
+    void op_addi(uint32_t instruction);
     void op_addiu(uint32_t instruction);
     void op_j(uint32_t instruction);
     void op_bne(uint32_t instruction);
