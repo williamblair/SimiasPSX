@@ -34,6 +34,7 @@ public:
     void op_addiu(uint32_t instruction);
     void op_j(uint32_t instruction);
     void op_bne(uint32_t instruction);
+    void op_lw(uint32_t instruction);
     
     /* Coprocessor operations */
     void op_cop0(uint32_t instruction);
@@ -78,6 +79,15 @@ private:
     /* General purpose registers */
     uint32_t m_Registers[32];
     
+    /* Purely for us (the programmers) to handle
+     * loading delay slots */
+    uint32_t m_OutRegisters[32];
+
+    /* The current load initiated by the current
+     * instruction; for load delay slots
+     * first entry is the register, second entry is the value */
+    uint32_t m_Load[2];
+
     /* Coprocessor 0 registers 
      * Defined here: https://wiki.osdev.org/MIPS_Overview#Coprocessor_0_Registers 
      * Most of these aren't actually used but its easier to be able to access
