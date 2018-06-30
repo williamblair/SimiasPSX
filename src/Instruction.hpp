@@ -13,6 +13,9 @@ namespace Instruction {
     /* bits 5-0 */
     uint32_t subfunction(uint32_t instruction);
     
+    /* Bits 25-21, same as below but for clarity's sake */
+    uint32_t cop_function(uint32_t instruction);
+
     /* Bits 25-21 */
     uint32_t rs(uint32_t instruction);
     

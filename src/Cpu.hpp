@@ -34,6 +34,10 @@ public:
     void op_j(uint32_t instruction);
     void op_or(uint32_t instruction);
     
+    /* Cop0 operations */
+    void op_cop0(uint32_t instruction);
+    void op_mtc0(uint32_t instruction);
+
 private:
     
     /* Constructor */
@@ -63,6 +67,9 @@ private:
 
     /* General purpose registers */
     uint32_t m_Registers[32];
+
+    /* Cop0 status register */
+    uint32_t m_StatusRegister;
 
     /* Interconnect */
     Interconnect *m_Interconnect;

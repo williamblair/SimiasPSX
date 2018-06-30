@@ -11,6 +11,11 @@ namespace Instruction {
         return instruction & 0x3F;
     }
     
+    uint32_t cop_function(uint32_t instruction)
+    {
+        return (instruction >> 21) & 0x1F;
+    }
+
     uint32_t rs(uint32_t instruction)
     {
         return (instruction >> 21) & 0x1F;

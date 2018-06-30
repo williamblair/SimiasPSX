@@ -18,6 +18,8 @@ Cpu::Cpu(void)
     /* Default the next instruction as a NOP */
     m_NextInstruction = 0;
 
+    m_StatusRegister = 0;
+
     m_Interconnect = NULL;
     
     /* Initialize the register values */
@@ -88,6 +90,8 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b001001: op_addiu(instruction); break;
         case 0b000010: op_j(instruction);     break;
         
+        case 0b010000: op_cop0(instruction);  break;
+
         default:       quitWithInstruction("Cpu::decode_and_execute: unhandled instruction",
                             instruction);
     }
@@ -151,6 +155,12 @@ void Cpu::op_ori(uint32_t instruction)
 /* Store Word */
 void Cpu::op_sw(uint32_t instruction)
 {
+    /* Don't write if the status register isolation bit is set */
+    if (m_StatusRegister & 0x10000 != 0) {
+        printf("Cpu::op_sw: cache isolated\n");
+        return;
+    }
+
     /* Store the contents of $t at the specified address plus an offset (i) 
      * The offset should be treated as a signed 16bit twos complement (so you
      * can have a negative offset) */
@@ -208,6 +218,38 @@ void Cpu::op_or(uint32_t instruction)
     uint32_t value = getRegister(s) | getRegister(t);
     setRegister(d, value);
 }
+
+/* Cop0 subfunction parser */
+void Cpu::op_cop0(uint32_t instruction)
+{
+    uint32_t func = Instruction::cop_function(instruction);
+
+    switch (func)
+    {
+        case 0b00100: op_mtc0(instruction); break;
+
+        default: quitWithInstruction("Cpu::op_cop0: unhandled cop0 function", instruction);
+    }
+}
+
+/* Move To Coprocessor 0 */
+void Cpu::op_mtc0(uint32_t instruction)
+{
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t d = Instruction::rd(instruction);
+
+    /* Get the value at CPU register t and copy it
+     * into COP0 register d */
+    uint32_t value = getRegister(t);
+
+    switch (d)
+    {
+        case 12: m_StatusRegister = value; break;
+
+        default: quitWithAddress("Cpu::op_mtc0: Uhandled cop0 register", d);
+    }
+}
+
 
 
 
