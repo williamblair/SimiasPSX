@@ -14,6 +14,9 @@ Cpu::Cpu(void)
 {
     /* Starting PC address of the PSX */
     m_PC = 0xBFC00000;
+    
+    /* Default the next instruction as a NOP */
+    m_NextInstruction = 0;
 
     m_Interconnect = NULL;
     
@@ -34,15 +37,18 @@ void Cpu::setInterconnect(Interconnect *i)
 
 void Cpu::runNextInstruction(void)
 {
+    /* Get the previously loaded instruction */
+    uint32_t instruction = m_NextInstruction;
+    
     /* Get the instruction at the current program counter */
-    uint32_t instruction = load32(m_PC);
+    m_NextInstruction = load32(m_PC);
 
     /* Increment the PC. In other languages we'd
      * have to make sure the PC moves back to 0 on 
      * overflow but C does that for us :) */
     m_PC += 4;
 
-    /* Run the instruction */
+    /* Run the previously loaded */
     decodeAndExecute(instruction);
 }
 
@@ -70,11 +76,13 @@ void Cpu::decodeAndExecute(uint32_t instruction)
             }
             break;
         
-        case 0b001111: op_lui(instruction); break;
-        case 0b001101: op_ori(instruction); break;
-        case 0b101011: op_sw(instruction);  break;
+        case 0b001111: op_lui(instruction);   break;
+        case 0b001101: op_ori(instruction);   break;
+        case 0b101011: op_sw(instruction);    break;
+        case 0b001001: op_addiu(instruction); break;
+        case 0b000010: op_j(instruction);     break;
         
-        default:       quitWithMessage("Cpu::decode_and_execute: unhandled instruction",
+        default:       quitWithInstruction("Cpu::decode_and_execute: unhandled instruction",
                             instruction);
     }
 }
@@ -101,7 +109,7 @@ uint32_t Cpu::getRegister(uint32_t index)
     
     else {
         /* Invalid register get */
-        quitWithMessage("Cpu::getRegister: invalid register index", index);
+        quitWithAddress("Cpu::getRegister: invalid register index", index);
     }
     
     return regVal;
@@ -160,3 +168,25 @@ void Cpu::op_sll(uint32_t instruction)
     setRegister(d, value);
 }
 
+/* Add immediate unsigned (no overflow) */
+void Cpu::op_addiu(uint32_t instruction)
+{
+    uint32_t s = Instruction::rs(instruction);
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t imm = Instruction::imm_se(instruction);
+    
+    /* Add the signed immediate value, ignoring overflow */
+    uint32_t value = getRegister(s) + imm;
+    setRegister(t, value);
+}
+
+/* Jump */
+void Cpu::op_j(uint32_t instruction)
+{
+    uint32_t target = Instruction::imm_jump(instruction);
+    
+    /* The target given to use shifted right by two that
+     * way the target can have 28 bits instead of 26, the first
+     * two being used by the instruction identifier */
+    m_PC = (m_PC & 0xF0000000) | (target << 2);
+}

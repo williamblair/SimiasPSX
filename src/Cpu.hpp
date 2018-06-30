@@ -30,6 +30,8 @@ public:
     void op_ori(uint32_t instruction);
     void op_sw (uint32_t instruction);
     void op_sll(uint32_t instruction);
+    void op_addiu(uint32_t instruction);
+    void op_j(uint32_t instruction);
     
 private:
     
@@ -53,6 +55,10 @@ private:
      
     /* Program Counter */
     uint32_t m_PC;
+    
+    /* The next loaded instruction, to simulate the branch
+     * delay slot */
+    uint32_t m_NextInstruction;
 
     /* General purpose registers */
     uint32_t m_Registers[32];

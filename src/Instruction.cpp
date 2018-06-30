@@ -40,4 +40,9 @@ namespace Instruction {
     {
         return (uint32_t) ((int16_t)(instruction & 0xFFFF));
     }
+    
+    uint32_t imm_jump(uint32_t instruction)
+    {
+        return instruction & 0x3FFFFFF;
+    }
 }

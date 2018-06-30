@@ -33,6 +33,10 @@ namespace Instruction {
     
     /* Signed extension */
     uint32_t imm_se(uint32_t instruction);
+    
+    /* Jump target 
+     * Bits 25-0 */
+    uint32_t imm_jump(uint32_t instruction);
 }
 
 #endif

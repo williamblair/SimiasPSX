@@ -37,6 +37,9 @@ private:
     
     /* Memory control range */
     Range MemControl;
+    
+    /* RAM_SIZE memory range */
+    Range RamSize;
 
     /* Singelton instance */
     static Interconnect *m_Interconnect;
