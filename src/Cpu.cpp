@@ -259,10 +259,10 @@ void Cpu::op_addi(uint32_t instruction)
 
     /* If the difference is going to cause overflow,
      * create an exception */
-    if (imm > (INT32_MAX - si32)) {
+    /*if (imm > (INT32_MAX - si32)) {
         quitWithInstruction("Cpu::op_addi: addition overflow!",
             instruction);
-    }
+    }*/
 
     /* Otherwise add like normal */
     uint32_t value = getRegister(s) + imm;
