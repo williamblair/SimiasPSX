@@ -1,6 +1,5 @@
 #include "Bios.hpp"
 #include "Quit.hpp"
-#include "Ram.hpp"
 
 #include <cstdio>
 #include <sstream>
@@ -27,7 +26,6 @@ public:
 
     /* Set our member pointers */
     void setBios(Bios *bios);
-    void setRam(Ram *ram);
 
 private:
 
@@ -36,14 +34,13 @@ private:
 
     /* Pointers to the Bios and RAM instance */
     Bios *m_Bios;
-    Ram  *m_Ram;
     
     /* Memory control range */
     Range MemControl;
     
     /* RAM_SIZE memory range */
     Range RamSize;
-    
+
     /* CACHE_CONTROL memory range */
     Range CacheControl;
 

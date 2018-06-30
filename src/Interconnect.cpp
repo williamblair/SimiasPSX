@@ -16,7 +16,6 @@ Interconnect::Interconnect(void)
   CacheControl (0xFFFe0130, 4)
 {
     m_Bios = NULL;
-    m_Ram = NULL;
 }
 
 Interconnect::~Interconnect(void)
@@ -26,11 +25,6 @@ Interconnect::~Interconnect(void)
 void Interconnect::setBios(Bios *bios)
 {
     m_Bios = bios;
-}
-
-void Interconnect::setRam(Ram *ram)
-{
-    m_Ram = ram;
 }
 
 uint32_t Interconnect::load32(uint32_t addr)
@@ -46,12 +40,6 @@ uint32_t Interconnect::load32(uint32_t addr)
     if (m_Bios->contains(addr)) {
         uint32_t offset = m_Bios->offset(addr);
         instruction = m_Bios->load32(offset);
-    }
-
-    /* If the address is within the RAM */
-    else if (m_Ram->contains(addr)) {
-        uint32_t offset = m_Ram->offset(addr);
-        instruction = m_Ram->load32(offset);
     }
 
     /* Unhandled address so far so halt */
@@ -106,12 +94,6 @@ void Interconnect::store32(uint32_t addr, uint32_t value)
         
         /* TODO - update */
         printf("Interconnect::store32: warning: unhandled write to CacheControl address: 0x%X\n", addr);
-    }
-    
-    else if (m_Ram->contains(addr)) {
-        offset = m_Ram->offset(addr);
-
-        m_Ram->store32(offset, value);
     }
 
     else {
