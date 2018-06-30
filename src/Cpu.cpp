@@ -22,7 +22,7 @@ Cpu::Cpu(void)
     
     /* Initialize the register values */
     std::memset(m_Registers, 0, sizeof(m_Registers));
-    
+    std::memset(m_Cop0Registers, 0, sizeof(m_Cop0Registers));
 }
 
 Cpu::~Cpu(void)
@@ -59,6 +59,13 @@ uint32_t Cpu::load32(uint32_t addr)
 
 void Cpu::store32(uint32_t addr, uint32_t value)
 {
+    /* If the cache is isolated we won't write 
+     * index 12 is the 'status register' */
+    if (m_Cop0Registers[12] & 0x00010000 != 0) {
+        printf("Cpu::store32: cache isloated, ignoring write\n");
+        return;
+    }
+    
     m_Interconnect->store32(addr, value);
 }
 
@@ -81,6 +88,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b101011: op_sw(instruction);    break;
         case 0b001001: op_addiu(instruction); break;
         case 0b000010: op_j(instruction);     break;
+        case 0b010000: op_cop0(instruction);  break;
         
         default:       quitWithInstruction("Cpu::decode_and_execute: unhandled instruction",
                             instruction);
@@ -115,6 +123,33 @@ uint32_t Cpu::getRegister(uint32_t index)
     return regVal;
 }
 
+void Cpu::setCop0Register(uint32_t index, uint32_t value)
+{
+    if (index < 15) {
+        m_Cop0Registers[index] = value;
+    }
+    
+    /* Invalid! */
+    else {
+        quitWithInstruction("Cpu::setCop0Register: Invalid register", value);
+    }
+}
+
+uint32_t Cpu::getCop0Register(uint32_t index)
+{
+    uint32_t value = 0;
+    
+    if (index < 15) {
+        value = m_Cop0Registers[index];
+    }
+    
+    /* Invalid! */
+    else {
+        quitWithInstruction("Cpu::getCop0Register: Invalid register", index);
+    }
+    
+    return index;
+}
 
 /* Load Upper Immediate */
 void Cpu::op_lui(uint32_t instruction)
@@ -190,3 +225,32 @@ void Cpu::op_j(uint32_t instruction)
      * two being used by the instruction identifier */
     m_PC = (m_PC & 0xF0000000) | (target << 2);
 }
+
+/* Coprocessor 0 instruction */
+void Cpu::op_cop0(uint32_t instruction)
+{
+    /* Get which cop0 instruction it is */
+    uint32_t cop_opcode = Instruction::cop_opcode(instruction);
+    
+    switch (cop_opcode)
+    {
+        case 0b00100: op_mtc0(instruction); break;
+        
+        default: quitWithInstruction("Cpu::op_cop0: unhandled cop_opcode", cop_opcode);
+    }
+}
+
+/* Move To Coprocessor 0 */
+void Cpu::op_mtc0(uint32_t instruction)
+{
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t d = Instruction::rd(instruction);
+    
+    /* Copy the contents of cpu register t into the coprocessor register d */
+    uint32_t value = getRegister(t);
+    setCop0Register(d, value);
+}
+
+
+
+

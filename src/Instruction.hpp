@@ -37,6 +37,9 @@ namespace Instruction {
     /* Jump target 
      * Bits 25-0 */
     uint32_t imm_jump(uint32_t instruction);
+    
+    /* Same as rs (Bits 25-21) */
+    uint32_t cop_opcode(uint32_t instruction);
 }
 
 #endif

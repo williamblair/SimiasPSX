@@ -33,6 +33,9 @@ public:
     void op_addiu(uint32_t instruction);
     void op_j(uint32_t instruction);
     
+    void op_cop0(uint32_t instruction);
+    void op_mtc0(uint32_t instruction);
+    
 private:
     
     /* Constructor */
@@ -50,6 +53,12 @@ private:
     /* Get a register value */
     uint32_t getRegister(uint32_t index);
     
+    /* Set a cop0 register */
+    void setCop0Register(uint32_t index, uint32_t value);
+    
+    /* Get a cop0 register */
+    uint32_t getCop0Register(uint32_t index);
+    
     /* Store a 32 bit value in memory */
     void store32(uint32_t addr, uint32_t value);
      
@@ -62,7 +71,13 @@ private:
 
     /* General purpose registers */
     uint32_t m_Registers[32];
-
+    
+    /* Coprocessor 0 registers 
+     * Defined here: https://wiki.osdev.org/MIPS_Overview#Coprocessor_0_Registers 
+     * Most of these aren't actually used but its easier to be able to access
+     * the register numbers without any mapping to their index */
+    uint32_t m_Cop0Registers[15];
+    
     /* Interconnect */
     Interconnect *m_Interconnect;
     

@@ -11,8 +11,9 @@ Interconnect *Interconnect::getInstance(void)
 }
 
 Interconnect::Interconnect(void)
-: MemControl(0x1F801000, 36),
-  RamSize   (0x1F801060, 4)
+: MemControl   (0x1F801000, 36),
+  RamSize      (0x1F801060, 4),
+  CacheControl (0xFFFe0130, 4)
 {
     m_Bios = NULL;
 }
@@ -84,6 +85,14 @@ void Interconnect::store32(uint32_t addr, uint32_t value)
         
         /* TODO - update */
         printf("Interconnect::store32: warning: unhandled write to RamSize address: 0x%X\n", addr);
+    }
+    
+    /* Map to CACHE CONTROL */
+    else if (CacheControl.contains(addr)) {
+        offset = CacheControl.offset(addr);
+        
+        /* TODO - update */
+        printf("Interconnect::store32: warning: unhandled write to CacheControl address: 0x%X\n", addr);
     }
     
     else {

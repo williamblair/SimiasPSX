@@ -40,6 +40,9 @@ private:
     
     /* RAM_SIZE memory range */
     Range RamSize;
+    
+    /* CACHE_CONTROL memory range */
+    Range CacheControl;
 
     /* Singelton instance */
     static Interconnect *m_Interconnect;
