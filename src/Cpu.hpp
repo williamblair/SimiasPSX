@@ -41,6 +41,7 @@ public:
     void op_bne(uint32_t instruction);
     void op_lw(uint32_t instruction);
     void op_sltu(uint32_t instruction);
+    void op_andi(uint32_t instruction);
     
     /* Cop0 operations */
     void op_cop0(uint32_t instruction);

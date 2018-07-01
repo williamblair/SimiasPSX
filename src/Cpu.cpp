@@ -111,6 +111,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b000011: op_jal(instruction);   break;
         case 0b000101: op_bne(instruction);   break;
         case 0b100011: op_lw(instruction);    break;
+        case 0b001100: op_andi(instruction);  break;
         
 
         case 0b010000: op_cop0(instruction);  break;
@@ -379,6 +380,18 @@ void Cpu::op_sltu(uint32_t instruction)
 
     /* 1 or 0 */
     setRegister(d, (uint32_t)(rs < rt));
+}
+
+/* Bitwise And Immediate */
+void Cpu::op_andi(uint32_t instruction)
+{
+    uint32_t s = Instruction::rs(instruction);
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t imm = Instruction::imm(instruction);
+
+    /* $t = $s & imm */
+    uint32_t value = getRegister(s) & imm;
+    setRegister(t, value);
 }
 
 /* Cop0 subfunction parser */
