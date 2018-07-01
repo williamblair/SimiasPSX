@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdint>
+#include <climits>
 
 #ifndef CPU_H_INCLUDED
 #define CPU_H_INCLUDED
@@ -30,9 +31,11 @@ public:
     void op_ori(uint32_t instruction);
     void op_sw (uint32_t instruction);
     void op_sll(uint32_t instruction);
+    void op_addi(uint32_t instruction);
     void op_addiu(uint32_t instruction);
     void op_j(uint32_t instruction);
     void op_or(uint32_t instruction);
+    void op_bne(uint32_t instruction);
     
     /* Cop0 operations */
     void op_cop0(uint32_t instruction);
@@ -57,7 +60,10 @@ private:
     
     /* Store a 32 bit value in memory */
     void store32(uint32_t addr, uint32_t value);
-     
+
+    /* Branch by the given offset, adjusting for << 2 */
+    void branch(uint32_t offset);
+
     /* Program Counter */
     uint32_t m_PC;
     

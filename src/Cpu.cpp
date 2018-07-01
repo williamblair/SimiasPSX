@@ -87,9 +87,12 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b001111: op_lui(instruction);   break;
         case 0b001101: op_ori(instruction);   break;
         case 0b101011: op_sw(instruction);    break;
+        case 0b001000: op_addi(instruction);  break;
         case 0b001001: op_addiu(instruction); break;
         case 0b000010: op_j(instruction);     break;
+        case 0b000101: op_bne(instruction);   break;
         
+
         case 0b010000: op_cop0(instruction);  break;
 
         default:       quitWithInstruction("Cpu::decode_and_execute: unhandled instruction",
@@ -125,6 +128,17 @@ uint32_t Cpu::getRegister(uint32_t index)
     return regVal;
 }
 
+void Cpu::branch(uint32_t offset)
+{
+    /* Multiply by 4 to make sure we're always 32bit aligned */
+    offset <<= 2;
+
+    m_PC += offset;
+
+    /* adjust for the pc += 4 in runNextInstruction,
+     * not combined with above to allow for overflow? (I think)  */
+    m_PC -= 4;
+}
 
 /* Load Upper Immediate */
 void Cpu::op_lui(uint32_t instruction)
@@ -184,6 +198,23 @@ void Cpu::op_sll(uint32_t instruction)
     setRegister(d, value);
 }
 
+/* Add immediate unsigned (WITH overflow exception) */
+void Cpu::op_addi(uint32_t instruction)
+{
+    int32_t imm = Instruction::imm_se(instruction);
+    uint32_t rt = Instruction::rt(instruction);
+    uint32_t rs = Instruction::rs(instruction);
+
+    /* Check if (as signed ints) the addition will
+     * cause overflow, and if so create an exception */
+    int32_t s = (int32_t) getRegister(rs);
+    if (s > (INT_MAX - imm)) {
+        quitWithInstruction("Cpu::op_addi: overflow", instruction);
+    }
+
+    setRegister(rt, s + imm);
+}
+
 /* Add immediate unsigned (no overflow) */
 void Cpu::op_addiu(uint32_t instruction)
 {
@@ -218,6 +249,23 @@ void Cpu::op_or(uint32_t instruction)
     uint32_t value = getRegister(s) | getRegister(t);
     setRegister(d, value);
 }
+
+/* Branch if Not Equal */
+void Cpu::op_bne(uint32_t instruction)
+{
+    uint32_t s = Instruction::rs(instruction);
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t imm = Instruction::imm_se(instruction);
+
+    /* Branch if the two registers are not equal */
+    uint32_t regs = getRegister(s);
+    uint32_t regt = getRegister(t);
+    if (regs != regt) {
+        //printf("BNE: instruction: 0x%08X    s: 0x%X    t: 0x%X    offset: %d\n", instruction, s, t, (int32_t)imm);
+        branch(imm);
+    }
+}
+
 
 /* Cop0 subfunction parser */
 void Cpu::op_cop0(uint32_t instruction)

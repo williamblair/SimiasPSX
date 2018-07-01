@@ -43,7 +43,8 @@ namespace Instruction {
     
     uint32_t imm_se(uint32_t instruction)
     {
-        return (uint32_t) ((int16_t)(instruction & 0xFFFF));
+        int16_t value = ((int16_t)instruction & 0xFFFF);
+        return (uint32_t) value;
     }
     
     uint32_t imm_jump(uint32_t instruction)
