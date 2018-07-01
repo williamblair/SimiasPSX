@@ -121,6 +121,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b001001: op_addiu(instruction); break;
         case 0b000010: op_j(instruction);     break;
         case 0b000011: op_jal(instruction);   break;
+        case 0b000100: op_beq(instruction);   break;
         case 0b000101: op_bne(instruction);   break;
         case 0b100000: op_lb(instruction);    break;
         case 0b100011: op_lw(instruction);    break;
@@ -370,6 +371,21 @@ void Cpu::op_or(uint32_t instruction)
     setRegister(d, value);
 }
 
+/* Branch if equal */
+void Cpu::op_beq(uint32_t instruction)
+{
+    uint32_t s = Instruction::rs(instruction);
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t imm = Instruction::imm_se(instruction);
+
+    /* Branch if the two registers ARE equal */
+    uint32_t regs = getRegister(s);
+    uint32_t regt = getRegister(t);
+    if (regs == regt) {
+        branch(imm);
+    }
+}
+
 /* Branch if Not Equal */
 void Cpu::op_bne(uint32_t instruction)
 {
@@ -377,7 +393,7 @@ void Cpu::op_bne(uint32_t instruction)
     uint32_t t = Instruction::rt(instruction);
     uint32_t imm = Instruction::imm_se(instruction);
 
-    /* Branch if the two registers are not equal */
+    /* Branch if the two registers ARE NOT equal */
     uint32_t regs = getRegister(s);
     uint32_t regt = getRegister(t);
     if (regs != regt) {

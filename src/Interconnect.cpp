@@ -15,6 +15,7 @@ Interconnect::Interconnect(void)
   RamSize      (0x1F801060, 4),
   CacheControl (0xFFFE0130, 4),
   SPU          (0x1F801C00, 640),
+  Expansion1   (0x1F000000, 524288), // 8 MB max size, 512kb default?
   Expansion2   (0x1F802000, 66)
 {
     m_Bios = NULL;
@@ -53,6 +54,15 @@ uint8_t Interconnect::load8(uint32_t addr)
     if (m_Bios->contains(addr)) {
         uint32_t offset = m_Bios->offset(addr);
         value = m_Bios->load8(offset);
+    }
+
+    else if (Expansion1.contains(addr)) {
+        printf("Interconnect::load8: returning default expansion1 value for addr 0x%X\n", addr);
+        // No expansion implemented,
+        // but this value is required for PSX licensing validation
+        // interestingly 0x81efe288 contains the ascii string
+        // "Licensed by Sony Computer Entertainment Inc."
+        return 0xFF;
     }
 
     else {

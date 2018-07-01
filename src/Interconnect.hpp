@@ -81,6 +81,9 @@ private:
     /* Sound Processing Unit mem range */
     Range SPU;
 
+    /* Expansion Range 1*/
+    Range Expansion1;
+
     /* Expansion Range 2 */
     Range Expansion2;
 

@@ -26,29 +26,45 @@ public:
      * and increment the PC */
     void runNextInstruction(void);
     
-    /* Operations */
+    /* Load operations */
+    void op_lw(uint32_t instruction);
+    void op_lb(uint32_t instruction);
     void op_lui(uint32_t instruction);
-    void op_ori(uint32_t instruction);
+
+    /* Store operations */
     void op_sb(uint32_t instruction);
     void op_sw (uint32_t instruction);
     void op_sh(uint32_t instruction);
-    void op_sll(uint32_t instruction);
+
+    /* Addition operations */
     void op_addi(uint32_t instruction);
     void op_addiu(uint32_t instruction);
     void op_addu(uint32_t instruction);
+
+    /* AND operations */
+    void op_andi(uint32_t instruction);
+
+    /* OR operations */
+    void op_ori(uint32_t instruction);
+    void op_or(uint32_t instruction);
+
+    /* Jump operations */
     void op_j(uint32_t instruction);
     void op_jr(uint32_t instruction);
     void op_jal(uint32_t instruction);
-    void op_or(uint32_t instruction);
+
+    /* Branch operations */
+    void op_beq(uint32_t instruction);
     void op_bne(uint32_t instruction);
-    void op_lw(uint32_t instruction);
-    void op_lb(uint32_t instruction);
-    void op_sltu(uint32_t instruction);
-    void op_andi(uint32_t instruction);
     
     /* Cop0 operations */
     void op_cop0(uint32_t instruction);
     void op_mtc0(uint32_t instruction);
+
+    /* Other operations */
+    void op_sll(uint32_t instruction);
+    void op_sltu(uint32_t instruction);
+
 
 private:
     
