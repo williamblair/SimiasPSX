@@ -33,6 +33,18 @@ void Interconnect::setRam(Ram *ram)
     m_Ram = ram;
 }
 
+uint32_t Interconnect::maskRegion(uint32_t addr)
+{
+    // DEBUG
+    printf("Interconnect::maskRegion addr: 0x%X\n", addr);
+    getchar();
+
+    /* Index address space is in 512 MB chunks */
+    uint32_t index = (addr >> 29);
+
+    return REGION_MASK[index];
+}
+
 uint32_t Interconnect::load32(uint32_t addr)
 {
     uint32_t instruction = 0;
@@ -42,6 +54,10 @@ uint32_t Interconnect::load32(uint32_t addr)
         quitWithAddress("Interconnect::load32: unaligned address", addr);
     }
     
+    /* Map the address to any mirrored mem region */
+    uint32_t mask = maskRegion(addr);
+    addr &= mask;
+
     if (m_Bios->contains(addr)) {
         uint32_t offset = m_Bios->offset(addr);
         instruction = m_Bios->load32(offset);
@@ -70,6 +86,10 @@ void Interconnect::store32(uint32_t addr, uint32_t value)
         quitWithAddress("Interconnect::store32: unaligned address", addr);
     }
     
+    /* Map the address to its mirrored mem region */
+    uint32_t mask = maskRegion(addr);
+    addr &= mask;
+
     /* Map to mem control */
     if (MemControl.contains(addr)) {
         

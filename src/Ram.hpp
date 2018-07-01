@@ -16,7 +16,9 @@
 #define MEM_RAM_SIZE (2 * 1024 * 1024)
 
 /* Memory start and length in PSX memory */
-#define RAM_MEM_START  0xA0000000
+// changed to use relative/mirrored regions
+//#define RAM_MEM_START  0xA0000000
+#define RAM_MEM_START 0x00000000
 #define RAM_MEM_LENGTH MEM_RAM_SIZE
 
 class Ram

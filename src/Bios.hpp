@@ -14,7 +14,9 @@
 #define BIOS_SIZE (512 * 1024)
 
 /* Memory start and length in PSX memory */
-#define BIOS_MEM_START  0xBFC00000
+// changed to use mirrored mem regions
+//#define BIOS_MEM_START  0xBFC00000
+#define BIOS_MEM_START 0x1FC00000
 #define BIOS_MEM_LENGTH BIOS_SIZE
 
 class Bios
