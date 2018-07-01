@@ -1,5 +1,6 @@
 #include "Cpu.hpp"
 #include "Bios.hpp"
+#include "Ram.hpp"
 #include "Interconnect.hpp"
 
 #include <iostream>
@@ -16,6 +17,7 @@ int main(int argc, char *argv[])
     /* Get each instance */
     static Cpu          *cpu          = Cpu::getInstance();
     static Bios         *bios         = Bios::getInstance();
+    static Ram          *ram          = Ram::getInstance();
     static Interconnect *interconnect = Interconnect::getInstance();
 
     /* Open the bios */
@@ -23,8 +25,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    /* Connect the Bios and the Cpu */
+    /* Connect the Bios/Ram and the Cpu */
     interconnect->setBios(bios);
+    interconnect->setRam(ram);
     cpu->setInterconnect(interconnect);
 
     /* Run the CPU! */
