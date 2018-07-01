@@ -60,6 +60,7 @@ void Cpu::runNextInstruction(void)
     m_Load[0] = m_Load[1] = 0;
 
     /* Run the previously loaded */
+    printf("PC 0x%X\n", m_PC-4);
     decodeAndExecute(instruction);
 
     /* Copy the output registers as input for the
