@@ -72,6 +72,11 @@ uint32_t Cpu::load32(uint32_t addr)
     return m_Interconnect->load32(addr);
 }
 
+void Cpu::store16(uint32_t addr, uint16_t value)
+{
+    m_Interconnect->store16(addr, value);
+}
+
 void Cpu::store32(uint32_t addr, uint32_t value)
 {
     m_Interconnect->store32(addr, value);
@@ -98,6 +103,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         
         case 0b001111: op_lui(instruction);   break;
         case 0b001101: op_ori(instruction);   break;
+        case 0b101001: op_sh(instruction);    break;
         case 0b101011: op_sw(instruction);    break;
         case 0b001000: op_addi(instruction);  break;
         case 0b001001: op_addiu(instruction); break;
@@ -191,6 +197,26 @@ void Cpu::op_ori(uint32_t instruction)
     uint32_t value = getRegister(s) | i;
     
     setRegister(t, value);
+}
+
+/* Store halfword */
+void Cpu::op_sh(uint32_t instruction)
+{
+    /* Don't write if cache isolated */
+    if (m_StatusRegister & 0x10000 != 0) {
+        printf("Cpu::op_sh: cache isolated!\n");
+        return;
+    }
+
+    uint32_t imm = Instruction::imm_se(instruction);
+    uint32_t t   = Instruction::rt(instruction);
+    uint32_t s   = Instruction::rs(instruction);
+
+    /* Get the address to write to plus offset */
+    uint32_t addr = getRegister(s) + imm;
+    uint32_t value = getRegister(t);
+
+    store16(addr, (uint16_t) value);
 }
 
 /* Store Word */

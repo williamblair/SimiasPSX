@@ -30,6 +30,7 @@ public:
     void op_lui(uint32_t instruction);
     void op_ori(uint32_t instruction);
     void op_sw (uint32_t instruction);
+    void op_sh(uint32_t instruction);
     void op_sll(uint32_t instruction);
     void op_addi(uint32_t instruction);
     void op_addiu(uint32_t instruction);
@@ -61,6 +62,9 @@ private:
     /* Get a register value */
     uint32_t getRegister(uint32_t index);
     
+    /* Store a 16 bit value in memory */
+    void store16(uint32_t addr, uint16_t value);
+
     /* Store a 32 bit value in memory */
     void store32(uint32_t addr, uint32_t value);
 

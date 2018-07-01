@@ -13,7 +13,8 @@ Interconnect *Interconnect::getInstance(void)
 Interconnect::Interconnect(void)
 : MemControl   (0x1F801000, 36),
   RamSize      (0x1F801060, 4),
-  CacheControl (0xFFFE0130, 4)
+  CacheControl (0xFFFE0130, 4),
+  SPU          (0x1F801C00, 640)
 {
     m_Bios = NULL;
     m_Ram = NULL;
@@ -71,6 +72,29 @@ uint32_t Interconnect::load32(uint32_t addr)
     }
 
     return instruction;
+}
+
+void Interconnect::store16(uint32_t addr, uint16_t value)
+{
+    //uint32_t offset;
+
+    /* Make sure we have aligned memory */
+    if (addr % 2 != 0) {
+        quitWithAddress("Interconnect::store16: unaligned address", addr);
+    }
+
+    /* Map the address to its mirrored mem region */
+    addr &= maskRegion(addr);
+
+    /* Map to SPU */
+    if (SPU.contains(addr)) {
+        printf("Interconnect::store16: warning: unhandled write to SPU address: 0x%X\n",
+            addr);
+    }
+
+    else {
+        quitWithAddress("Interconnect::store16: unhandled address", addr);
+    }
 }
 
 void Interconnect::store32(uint32_t addr, uint32_t value)
