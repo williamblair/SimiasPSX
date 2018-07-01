@@ -8,6 +8,24 @@
 #ifndef INTERCONNECT_H_INCLUDED
 #define INTERCONNECT_H_INCLUDED
 
+/* Masks to strip the region bits of the
+ * address - uses 3MSBs of each address
+ * KSEG2 not touched since it doesn't
+ * share anything with the other regions */
+const uint32_t REGION_MASK[8] = {
+    /* KUSEG: 2048MB */
+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+
+    /* KSEG0: 512MB */
+    0x7FFFFFFF,
+
+    /* KSEG1: 512MB */
+    0x1FFFFFFF,
+
+    /* KSEG2: 1024MB */
+    0xFFFFFFFF, 0xFFFFFFFF
+};
+
 class Interconnect
 {
 public:
@@ -33,6 +51,9 @@ private:
 
     /* Constructor */
     Interconnect(void);
+
+    /* Mask a CPU address to remove the region bits */
+    uint32_t maskRegion(uint32_t addr);
 
     /* Pointers to the Bios and Ram instance */
     Bios *m_Bios;
