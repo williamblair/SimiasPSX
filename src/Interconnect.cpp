@@ -35,10 +35,6 @@ void Interconnect::setRam(Ram *ram)
 
 uint32_t Interconnect::maskRegion(uint32_t addr)
 {
-    // DEBUG
-    printf("Interconnect::maskRegion addr: 0x%X\n", addr);
-    getchar();
-
     /* Index address space is in 512 MB chunks */
     uint32_t index = (addr >> 29);
 
