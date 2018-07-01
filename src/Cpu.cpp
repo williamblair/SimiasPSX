@@ -103,6 +103,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
             {
                 case 0b000000: op_sll(instruction); break;
                 case 0b100101: op_or(instruction);  break;
+                case 0b100100: op_and(instruction); break;
                 case 0b101011: op_sltu(instruction); break;
                 case 0b100001: op_addu(instruction); break;
                 case 0b001000: op_jr(instruction);   break;
@@ -290,15 +291,24 @@ void Cpu::op_sll(uint32_t instruction)
 /* Add immediate unsigned (WITH overflow exception) */
 void Cpu::op_addi(uint32_t instruction)
 {
-    int32_t imm = Instruction::imm_se(instruction);
+    int32_t imm = (int32_t) Instruction::imm_se(instruction);
     uint32_t rt = Instruction::rt(instruction);
     uint32_t rs = Instruction::rs(instruction);
+
 
     /* Check if (as signed ints) the addition will
      * cause overflow, and if so create an exception */
     int32_t s = (int32_t) getRegister(rs);
-    if (s > (INT_MAX - imm)) {
+    if ((imm > 0) && (s > (INT_MAX - imm))) {
+        printf("Imm: %d    s: %d\n", imm, s);
         quitWithInstruction("Cpu::op_addi: overflow", instruction);
+    }
+
+    /* Check of underflow */
+    else if ((imm < 0) && (s < (INT_MAX - imm))) {
+        printf("Imm: %d    s: %d\n", imm, s);
+        printf("Cpu::op_addi: underflow...", instruction);
+        // don't think an exception would occur here...
     }
 
     setRegister(rt, s + imm);
@@ -464,6 +474,18 @@ void Cpu::op_sltu(uint32_t instruction)
     setRegister(d, (uint32_t)(rs < rt));
 }
 
+/* Bitwise And */
+void Cpu::op_and(uint32_t instruction)
+{
+    uint32_t s = Instruction::rs(instruction);
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t d = Instruction::rd(instruction);
+
+    /* $d = $s & $t */
+    uint32_t value = getRegister(s) & getRegister(t);
+    setRegister(d, value);
+}
+
 /* Bitwise And Immediate */
 void Cpu::op_andi(uint32_t instruction)
 {
@@ -484,6 +506,7 @@ void Cpu::op_cop0(uint32_t instruction)
     switch (func)
     {
         case 0b00100: op_mtc0(instruction); break;
+        case 0b00000: op_mfc0(instruction); break;
 
         default: quitWithInstruction("Cpu::op_cop0: unhandled cop0 function", instruction);
     }
@@ -527,7 +550,30 @@ void Cpu::op_mtc0(uint32_t instruction)
     }
 }
 
+/* Move Frome coprocessor 0 */
+void Cpu::op_mfc0(uint32_t instruction)
+{
+    uint32_t value = 0;
 
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t d = Instruction::rd(instruction);
+
+    switch (d)
+    {
+        case 12: value = m_StatusRegister; break;
+        case 13:
+            quitWithInstruction("Cpu::op_mfc0: unhandled read from cause register",
+                instruction);
+            break;
+        default:
+            quitWithInstruction("Cpu::op_mfc0: unhandled read from cop0 register",
+                d);
+            break;
+    }
+
+    /* Need to use load delay slot for this one */
+    m_Load[0] = t; m_Load[1] = value;
+}
 
 
 

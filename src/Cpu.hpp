@@ -42,6 +42,7 @@ public:
     void op_addu(uint32_t instruction);
 
     /* AND operations */
+    void op_and(uint32_t instruction);
     void op_andi(uint32_t instruction);
 
     /* OR operations */
@@ -59,6 +60,7 @@ public:
     
     /* Cop0 operations */
     void op_cop0(uint32_t instruction);
+    void op_mfc0(uint32_t instruction);
     void op_mtc0(uint32_t instruction);
 
     /* Other operations */
