@@ -36,6 +36,7 @@ public:
     void op_j(uint32_t instruction);
     void op_or(uint32_t instruction);
     void op_bne(uint32_t instruction);
+    void op_lw(uint32_t instruction);
     
     /* Cop0 operations */
     void op_cop0(uint32_t instruction);
@@ -73,6 +74,15 @@ private:
 
     /* General purpose registers */
     uint32_t m_Registers[32];
+
+    /* Output registers (to be copied into m_Registers
+     * each cycle) -> to handle load delay slots */
+    uint32_t m_OutRegisters[32];
+
+    /* The previous/queued Load into a register
+     * First entry is the register, second entry is the
+     * value to put in that register */
+    uint32_t m_Load[2];
 
     /* Cop0 status register */
     uint32_t m_StatusRegister;

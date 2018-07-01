@@ -24,7 +24,9 @@ Cpu::Cpu(void)
     
     /* Initialize the register values */
     std::memset(m_Registers, 0, sizeof(m_Registers));
+    std::memset(m_OutRegisters, 0, sizeof(m_OutRegisters));
     
+    m_Load[0] = m_Load[1] = 0;
 }
 
 Cpu::~Cpu(void)
@@ -50,11 +52,19 @@ void Cpu::runNextInstruction(void)
      * overflow but C does that for us :) */
     m_PC += 4;
 
+    /* Set the queued (if any) load register value */
+    setRegister(m_Load[0], m_Load[1]);
+
+    /* Set the queued load to moving a 0 in 0,
+     * so basically a noop */
+    m_Load[0] = m_Load[1] = 0;
+
     /* Run the previously loaded */
-    // DEBUG
-    //printf("PC: 0x%08X    Instruction: 0x%08X\n", m_PC-8, instruction);
-    //getchar();
     decodeAndExecute(instruction);
+
+    /* Copy the output registers as input for the
+     * next instruction */
+    std::memcpy(m_Registers, m_OutRegisters, sizeof(m_Registers));
 }
 
 uint32_t Cpu::load32(uint32_t addr)
@@ -91,6 +101,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b001001: op_addiu(instruction); break;
         case 0b000010: op_j(instruction);     break;
         case 0b000101: op_bne(instruction);   break;
+        case 0b100011: op_lw(instruction);    break;
         
 
         case 0b010000: op_cop0(instruction);  break;
@@ -102,13 +113,27 @@ void Cpu::decodeAndExecute(uint32_t instruction)
 
 void Cpu::setRegister(uint32_t index, uint32_t value)
 {
-    
+#if 0
     if (index < 32) {
         m_Registers[index] = value;
     }
     
     /* Can't set register 0 as its always 0 */
     m_Registers[0] = 0;
+#endif
+
+    /* Queue a register load */
+    if (index < 32) {
+        m_OutRegisters[index] = value;
+    }
+
+    /* Invalid index! */
+    else {
+        quitWithAddress("Cpu::setRegister: invalid index", index);
+    }
+
+    /* Can't set register 0 as its always 0 */
+    m_OutRegisters[0] = 0;
 }
 
 uint32_t Cpu::getRegister(uint32_t index)
@@ -264,6 +289,29 @@ void Cpu::op_bne(uint32_t instruction)
         //printf("BNE: instruction: 0x%08X    s: 0x%X    t: 0x%X    offset: %d\n", instruction, s, t, (int32_t)imm);
         branch(imm);
     }
+}
+
+/* Load Word */
+void Cpu::op_lw(uint32_t instruction)
+{
+    /* Ignore isolated cache */
+    if (m_StatusRegister & 0x10000 != 0) {
+        printf("Cpu::op_lw: ignoring isolated cache!\n");
+        return;
+    }
+
+    uint32_t imm = Instruction::imm_se(instruction);
+    uint32_t t   = Instruction::rt(instruction);
+    uint32_t s   = Instruction::rs(instruction);
+
+    /* Get the address plus the given offset */
+    uint32_t addr = getRegister(s) + imm;
+
+    /* Load the value at address and queue a register load
+     * value in the load delay slot */
+    uint32_t value = load32(addr);
+
+    m_Load[0] = t; m_Load[1] = value;
 }
 
 
