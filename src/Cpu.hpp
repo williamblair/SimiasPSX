@@ -36,6 +36,7 @@ public:
     void op_addiu(uint32_t instruction);
     void op_addu(uint32_t instruction);
     void op_j(uint32_t instruction);
+    void op_jal(uint32_t instruction);
     void op_or(uint32_t instruction);
     void op_bne(uint32_t instruction);
     void op_lw(uint32_t instruction);

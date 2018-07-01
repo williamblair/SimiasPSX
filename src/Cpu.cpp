@@ -108,6 +108,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b001000: op_addi(instruction);  break;
         case 0b001001: op_addiu(instruction); break;
         case 0b000010: op_j(instruction);     break;
+        case 0b000011: op_jal(instruction);   break;
         case 0b000101: op_bne(instruction);   break;
         case 0b100011: op_lw(instruction);    break;
         
@@ -300,6 +301,17 @@ void Cpu::op_j(uint32_t instruction)
     /* The target given to use shifted right by two that
      * way the target can have 28 bits instead of 26, the first
      * two being used by the instruction identifier */
+    m_PC = (m_PC & 0xF0000000) | (target << 2);
+}
+
+/* Jump and Link */
+void Cpu::op_jal(uint32_t instruction)
+{
+    uint32_t target = Instruction::imm_jump(instruction);
+
+    /* Jump to calculated address and store the return
+     * address in $31 */
+    setRegister(31, m_PC);
     m_PC = (m_PC & 0xF0000000) | (target << 2);
 }
 
