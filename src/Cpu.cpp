@@ -340,7 +340,27 @@ void Cpu::op_mtc0(uint32_t instruction)
 
     switch (d)
     {
+        case 3:
+        case 5:
+        case 6:
+        case 7:
+        case 9:
+        case 11:
+
+            if (value != 0){
+                quitWithAddress("Cpu::op_mtc0: Unhandled write to breakpoint register",
+                    value);
+            }
+            break;
+
         case 12: m_StatusRegister = value; break;
+
+        case 13:
+
+            if (value != 0) {
+                quitWithAddress("Cpu::op_mtc0: Unhandled write to CAUSE register", value);
+            }
+            break;
 
         default: quitWithAddress("Cpu::op_mtc0: Uhandled cop0 register", d);
     }
