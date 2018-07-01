@@ -101,9 +101,10 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b000000:
             switch(Instruction::subfunction(instruction))
             {
-                case 0b000000: op_sll(instruction); break;
-                case 0b100101: op_or(instruction);  break;
-                case 0b100100: op_and(instruction); break;
+                case 0b000000: op_sll(instruction);  break;
+                case 0b100000: op_add(instruction);  break;
+                case 0b100101: op_or(instruction);   break;
+                case 0b100100: op_and(instruction);  break;
                 case 0b101011: op_sltu(instruction); break;
                 case 0b100001: op_addu(instruction); break;
                 case 0b001000: op_jr(instruction);   break;
@@ -336,6 +337,35 @@ void Cpu::op_addu(uint32_t instruction)
     /* $d = $s + $t */
     uint32_t value = getRegister(s) + getRegister(t);
     setRegister(d, value);
+}
+
+/* Add (with overflow) */
+void Cpu::op_add(uint32_t instruction)
+{
+    uint32_t s = Instruction::rs(instruction);
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t d = Instruction::rd(instruction);
+
+    /* Cast as signed ints for overflow checking */
+    int32_t rs = (int32_t) getRegister(s);
+    int32_t rt = (int32_t) getRegister(t);
+
+    /* Check if (as signed ints) the addition will
+     * cause overflow, and if so create an exception */
+    if ((rs > 0) && (rt > (INT_MAX - rs))) {
+        printf("s: %d    t: %d\n", rs, rt);
+        quitWithInstruction("Cpu::op_add: overflow", instruction);
+    }
+
+    /* Check of underflow */
+    else if ((rs < 0) && (rt < (INT_MAX - rs))) {
+        printf("s: %d    t: %d\n", rs, rt);
+        printf("Cpu::op_add: underflow...", instruction);
+        // don't think an exception would occur here...
+    }
+
+    /* $d = $s + $t */
+    setRegister(d, (uint32_t) (rs+rt));
 }
 
 /* Jump */

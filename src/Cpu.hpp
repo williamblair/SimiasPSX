@@ -40,6 +40,7 @@ public:
     void op_addi(uint32_t instruction);
     void op_addiu(uint32_t instruction);
     void op_addu(uint32_t instruction);
+    void op_add(uint32_t instruction);
 
     /* AND operations */
     void op_and(uint32_t instruction);
