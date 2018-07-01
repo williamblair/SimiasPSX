@@ -1,8 +1,18 @@
-.PHONY: clean All
+# psx emulator makefile
 
-All:
-	@echo "----------Building project:[ SimiasPSX - Debug ]----------"
-	@"$(MAKE)" -f  "SimiasPSX.mk"
+BIN  = main
+OBJS = build/main.o build/Cpu.o build/Bios.o build/Interconnect.o \
+       build/Range.o build/Quit.o build/Instruction.o build/Ram.o
+
+CC     = g++
+CFLAGS = -g -Wall -std=c++11 
+
+build/%.o: src/%.cpp
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+all: $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(BIN)
+
 clean:
-	@echo "----------Cleaning project:[ SimiasPSX - Debug ]----------"
-	@"$(MAKE)" -f  "SimiasPSX.mk" clean
+	rm -rf $(OBJS) $(BIN)
+
