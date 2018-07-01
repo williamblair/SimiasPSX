@@ -38,8 +38,15 @@ public:
     uint32_t offset(uint32_t addr);
 
     /* Convert the Ram data at the given offset
-     * to little endian and return it */
+     * to little endian and return it as 8bit */
+    uint8_t load8(uint32_t offset);
+
+    /* Convert the Ram data at the given offset
+     * to little endian and return it as 32bit */
     uint32_t load32(uint32_t offset);
+
+    /* Store the 8bit value in our data */
+    void store8(uint32_t offset, uint8_t value);
 
     /* Store the 32bit value into 4 8bit chunks
      * in our data */

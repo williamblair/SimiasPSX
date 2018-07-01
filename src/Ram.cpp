@@ -31,6 +31,13 @@ uint32_t Ram::offset(uint32_t addr)
     return m_Range.offset(addr);
 }
 
+uint8_t Ram::load8(uint32_t offset)
+{
+    /* No need for conversion as we're
+     * returning a single unsigned char */
+    return (uint8_t) m_Data[offset];
+}
+
 uint32_t Ram::load32(uint32_t offset)
 {
 
@@ -42,6 +49,13 @@ uint32_t Ram::load32(uint32_t offset)
 
     /* Return the bytes in reversed order */
     return byte0 | (byte1 << 8) | (byte2 << 16) | (byte3 << 24);
+}
+
+void Ram::store8(uint32_t offset, uint8_t value)
+{
+    /* No need for conversion as we're
+     * storing a single unsigned char */
+    m_Data[offset] = value;
 }
 
 void Ram::store32(uint32_t offset, uint32_t value)

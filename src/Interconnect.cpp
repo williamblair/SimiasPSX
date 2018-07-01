@@ -15,7 +15,7 @@ Interconnect::Interconnect(void)
   RamSize      (0x1F801060, 4),
   CacheControl (0xFFFE0130, 4),
   SPU          (0x1F801C00, 640),
-  Expansion1   (0x1F000000, 524288), // 8 MB max size, 512kb default?
+  Expansion1   (0x1F000000, 512*1024), // 8 MB max size, 512kb default?
   Expansion2   (0x1F802000, 66)
 {
     m_Bios = NULL;
@@ -54,6 +54,11 @@ uint8_t Interconnect::load8(uint32_t addr)
     if (m_Bios->contains(addr)) {
         uint32_t offset = m_Bios->offset(addr);
         value = m_Bios->load8(offset);
+    }
+
+    else if (m_Ram->contains(addr)) {
+        uint32_t offset = m_Ram->offset(addr);
+        value = m_Ram->load8(offset);
     }
 
     else if (Expansion1.contains(addr)) {
@@ -111,8 +116,14 @@ void Interconnect::store8(uint32_t addr, uint8_t value)
     /* Map the address to its mirrored mem region */
     addr &= maskRegion(addr);
 
+    /* RAM */
+    if (m_Ram->contains(addr)) {
+        uint32_t offset = m_Ram->offset(addr);
+        m_Ram->store8(offset, value);
+    }
+
     /* Expansion Port 2 */
-    if (Expansion2.contains(addr)) {
+    else if (Expansion2.contains(addr)) {
         printf("Interconnect::store8: warning: unhandled write to expansion port 2 address: 0x%X\n",
             addr);
     }
