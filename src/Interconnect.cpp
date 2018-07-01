@@ -14,7 +14,8 @@ Interconnect::Interconnect(void)
 : MemControl   (0x1F801000, 36),
   RamSize      (0x1F801060, 4),
   CacheControl (0xFFFE0130, 4),
-  SPU          (0x1F801C00, 640)
+  SPU          (0x1F801C00, 640),
+  Expansion2   (0x1F802000, 66)
 {
     m_Bios = NULL;
     m_Ram = NULL;
@@ -72,6 +73,24 @@ uint32_t Interconnect::load32(uint32_t addr)
     }
 
     return instruction;
+}
+
+void Interconnect::store8(uint32_t addr, uint8_t value)
+{
+    // No need to check alignment i assume
+
+    /* Map the address to its mirrored mem region */
+    addr &= maskRegion(addr);
+
+    /* Expansion Port 2 */
+    if (Expansion2.contains(addr)) {
+        printf("Interconnect::store8: warning: unhandled write to expansion port 2 address: 0x%X\n",
+            addr);
+    }
+
+    else {
+        quitWithAddress("Interconnect::store8: unhandled address", addr);
+    }
 }
 
 void Interconnect::store16(uint32_t addr, uint16_t value)

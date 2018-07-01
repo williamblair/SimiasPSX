@@ -29,6 +29,7 @@ public:
     /* Operations */
     void op_lui(uint32_t instruction);
     void op_ori(uint32_t instruction);
+    void op_sb(uint32_t instruction);
     void op_sw (uint32_t instruction);
     void op_sh(uint32_t instruction);
     void op_sll(uint32_t instruction);
@@ -36,6 +37,7 @@ public:
     void op_addiu(uint32_t instruction);
     void op_addu(uint32_t instruction);
     void op_j(uint32_t instruction);
+    void op_jr(uint32_t instruction);
     void op_jal(uint32_t instruction);
     void op_or(uint32_t instruction);
     void op_bne(uint32_t instruction);
@@ -64,6 +66,9 @@ private:
     /* Get a register value */
     uint32_t getRegister(uint32_t index);
     
+    /* Store a 8 bit value in memory */
+    void store8(uint32_t addr, uint8_t value);
+
     /* Store a 16 bit value in memory */
     void store16(uint32_t addr, uint16_t value);
 

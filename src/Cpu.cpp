@@ -72,6 +72,11 @@ uint32_t Cpu::load32(uint32_t addr)
     return m_Interconnect->load32(addr);
 }
 
+void Cpu::store8(uint32_t addr, uint8_t value)
+{
+    m_Interconnect->store8(addr, value);
+}
+
 void Cpu::store16(uint32_t addr, uint16_t value)
 {
     m_Interconnect->store16(addr, value);
@@ -95,6 +100,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
                 case 0b100101: op_or(instruction);  break;
                 case 0b101011: op_sltu(instruction); break;
                 case 0b100001: op_addu(instruction); break;
+                case 0b001000: op_jr(instruction);   break;
                 
                 default: quitWithInstruction("Cpu::decode_and_execute: unandled subfunction",
                             instruction);
@@ -103,6 +109,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         
         case 0b001111: op_lui(instruction);   break;
         case 0b001101: op_ori(instruction);   break;
+        case 0b101000: op_sb(instruction);    break;
         case 0b101001: op_sh(instruction);    break;
         case 0b101011: op_sw(instruction);    break;
         case 0b001000: op_addi(instruction);  break;
@@ -199,6 +206,26 @@ void Cpu::op_ori(uint32_t instruction)
     uint32_t value = getRegister(s) | i;
     
     setRegister(t, value);
+}
+
+/* Store byte */
+void Cpu::op_sb(uint32_t instruction)
+{
+    /* Don't write if cache isolated */
+    if (m_StatusRegister & 0x10000 != 0) {
+        printf("Cpu::op_sb: cache isolated!\n");
+        return;
+    }
+
+    int32_t imm = Instruction::imm_se(instruction);
+    uint32_t t  = Instruction::rt(instruction);
+    uint32_t s  = Instruction::rs(instruction);
+
+    /* Get the address to write to plus offset */
+    uint32_t addr = getRegister(s) + imm;
+    uint32_t value = getRegister(t);
+
+    store8(addr, (uint8_t) value);
 }
 
 /* Store halfword */
@@ -303,6 +330,15 @@ void Cpu::op_j(uint32_t instruction)
      * way the target can have 28 bits instead of 26, the first
      * two being used by the instruction identifier */
     m_PC = (m_PC & 0xF0000000) | (target << 2);
+}
+
+/* Jump Register */
+void Cpu::op_jr(uint32_t instruction)
+{
+    uint32_t s = Instruction::rs(instruction);
+
+    /* Jump to the address contained in register $s */
+    m_PC = getRegister(s);
 }
 
 /* Jump and Link */

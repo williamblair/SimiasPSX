@@ -40,6 +40,9 @@ public:
      * e.g. Bios etc. */
     uint32_t load32(uint32_t addr);
     
+    /* Map and store the given byte into the given address */
+    void store8(uint32_t addr, uint8_t value);
+
     /* Map and store the given halfword into the given address */
     void store16(uint32_t addr, uint16_t value);
 
@@ -73,6 +76,9 @@ private:
 
     /* Sound Processing Unit mem range */
     Range SPU;
+
+    /* Expansion Range 2 */
+    Range Expansion2;
 
     /* Singelton instance */
     static Interconnect *m_Interconnect;
