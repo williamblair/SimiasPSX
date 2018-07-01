@@ -67,6 +67,11 @@ void Cpu::runNextInstruction(void)
     std::memcpy(m_Registers, m_OutRegisters, sizeof(m_Registers));
 }
 
+uint8_t Cpu::load8(uint32_t addr)
+{
+    return m_Interconnect->load8(addr);
+}
+
 uint32_t Cpu::load32(uint32_t addr)
 {
     return m_Interconnect->load32(addr);
@@ -117,6 +122,7 @@ void Cpu::decodeAndExecute(uint32_t instruction)
         case 0b000010: op_j(instruction);     break;
         case 0b000011: op_jal(instruction);   break;
         case 0b000101: op_bne(instruction);   break;
+        case 0b100000: op_lb(instruction);    break;
         case 0b100011: op_lw(instruction);    break;
         case 0b001100: op_andi(instruction);  break;
         
@@ -380,10 +386,34 @@ void Cpu::op_bne(uint32_t instruction)
     }
 }
 
+/* Load byte */
+void Cpu::op_lb(uint32_t instruction)
+{
+    /* Ignore if isolated cache */
+    if (m_StatusRegister & 0x10000 != 0) {
+        printf("Cpu::op_lb: ignoring isolated cache!\n");
+        return;
+    }
+
+    uint32_t imm = Instruction::imm_se(instruction);
+    uint32_t t   = Instruction::rt(instruction);
+    uint32_t s   = Instruction::rs(instruction);
+
+    /* Get the address plus the given offset */
+    uint32_t addr = getRegister(s) + imm;
+
+    /* Load the value at address and queue a register load
+     * value in the load delay slot
+     * notice signed value, not unsigned */
+    int8_t value = (int8_t) load8(addr);
+
+    m_Load[0] = t; m_Load[1] = (uint32_t) value;
+}
+
 /* Load Word */
 void Cpu::op_lw(uint32_t instruction)
 {
-    /* Ignore isolated cache */
+    /* Ignore if isolated cache */
     if (m_StatusRegister & 0x10000 != 0) {
         printf("Cpu::op_lw: ignoring isolated cache!\n");
         return;

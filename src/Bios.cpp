@@ -33,6 +33,18 @@ uint32_t Bios::offset(uint32_t addr)
     return m_Range.offset(addr);
 }
 
+uint8_t Bios::load8(uint32_t offset)
+{
+    if (!m_Data) {
+        fprintf(stderr, "Bios::load8: bios data is NULL!\n");
+        return 0;
+    }
+
+    /* No need to reverse anything since we're only returning
+     * 8bits (1 unsigned char) */
+    return (uint8_t) m_Data[offset];
+}
+
 uint32_t Bios::load32(uint32_t offset)
 {
     if (!m_Data) {

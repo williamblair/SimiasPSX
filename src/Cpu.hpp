@@ -42,6 +42,7 @@ public:
     void op_or(uint32_t instruction);
     void op_bne(uint32_t instruction);
     void op_lw(uint32_t instruction);
+    void op_lb(uint32_t instruction);
     void op_sltu(uint32_t instruction);
     void op_andi(uint32_t instruction);
     
@@ -54,7 +55,10 @@ private:
     /* Constructor */
     Cpu(void);
 
-    /* Get the instruction from memory based on the PC */
+    /* Get the instruction from memory based on the PC as 8bit*/
+    uint8_t load8(uint32_t addr);
+
+    /* Get the instruction from memory based on the PC as 32bit */
     uint32_t load32(uint32_t addr);
 
     /* Parse the instruction and run it */

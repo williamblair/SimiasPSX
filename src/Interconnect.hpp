@@ -37,7 +37,11 @@ public:
     static Interconnect *getInstance(void);
 
     /* Map the given address to its location
-     * e.g. Bios etc. */
+     * and return 8bits */
+    uint8_t load8(uint32_t addr);
+
+    /* Map the given address to its location
+     * and return 32bits */
     uint32_t load32(uint32_t addr);
     
     /* Map and store the given byte into the given address */

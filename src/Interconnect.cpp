@@ -43,6 +43,25 @@ uint32_t Interconnect::maskRegion(uint32_t addr)
     return REGION_MASK[index];
 }
 
+uint8_t Interconnect::load8(uint32_t addr)
+{
+    uint8_t value = 0;
+
+    /* Map the address to its mirrored mem region */
+    addr &= maskRegion(addr);
+
+    if (m_Bios->contains(addr)) {
+        uint32_t offset = m_Bios->offset(addr);
+        value = m_Bios->load8(offset);
+    }
+
+    else {
+        quitWithAddress("Interconnect::load8: unhandled address", addr);
+    }
+
+    return value;
+}
+
 uint32_t Interconnect::load32(uint32_t addr)
 {
     uint32_t instruction = 0;

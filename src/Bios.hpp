@@ -38,6 +38,10 @@ public:
     /* Return the offset in the internal range */
     uint32_t offset(uint32_t addr);
 
+    /* Convert the bios data at the given
+     * offset to little endian and return 8bits */
+    uint8_t load8(uint32_t offset);
+
     /* Convert the bios data at the given offset
      * to little endian and return it */
     uint32_t load32(uint32_t offset);
