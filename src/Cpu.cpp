@@ -88,6 +88,8 @@ void Cpu::decodeAndExecute(uint32_t instruction)
             {
                 case 0b000000: op_sll(instruction); break;
                 case 0b100101: op_or(instruction);  break;
+                case 0b101011: op_sltu(instruction); break;
+                case 0b100001: op_addu(instruction); break;
                 
                 default: quitWithInstruction("Cpu::decode_and_execute: unandled subfunction",
                             instruction);
@@ -252,6 +254,18 @@ void Cpu::op_addiu(uint32_t instruction)
     setRegister(t, value);
 }
 
+/* Add unsigned (no overflow) */
+void Cpu::op_addu(uint32_t instruction)
+{
+    uint32_t s = Instruction::rs(instruction);
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t d = Instruction::rd(instruction);
+
+    /* $d = $s + $t */
+    uint32_t value = getRegister(s) + getRegister(t);
+    setRegister(d, value);
+}
+
 /* Jump */
 void Cpu::op_j(uint32_t instruction)
 {
@@ -314,6 +328,20 @@ void Cpu::op_lw(uint32_t instruction)
     m_Load[0] = t; m_Load[1] = value;
 }
 
+/* Set register if Less Than Unsigned */
+void Cpu::op_sltu(uint32_t instruction)
+{
+    uint32_t s = Instruction::rs(instruction);
+    uint32_t t = Instruction::rt(instruction);
+    uint32_t d = Instruction::rd(instruction);
+
+    /* If $s < $t $d = 1, $d = 0 otherwise */
+    uint32_t rs = getRegister(s);
+    uint32_t rt = getRegister(t);
+
+    /* 1 or 0 */
+    setRegister(d, (uint32_t)(rs < rt));
+}
 
 /* Cop0 subfunction parser */
 void Cpu::op_cop0(uint32_t instruction)

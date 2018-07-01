@@ -33,10 +33,12 @@ public:
     void op_sll(uint32_t instruction);
     void op_addi(uint32_t instruction);
     void op_addiu(uint32_t instruction);
+    void op_addu(uint32_t instruction);
     void op_j(uint32_t instruction);
     void op_or(uint32_t instruction);
     void op_bne(uint32_t instruction);
     void op_lw(uint32_t instruction);
+    void op_sltu(uint32_t instruction);
     
     /* Cop0 operations */
     void op_cop0(uint32_t instruction);
