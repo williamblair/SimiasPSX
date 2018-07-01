@@ -90,6 +90,12 @@ void Interconnect::store32(uint32_t addr, uint32_t value)
         }
     }
     
+    /* Map to RAM Memory */
+    else if (m_Ram->contains(addr)) {
+        offset = m_Ram->offset(addr);
+        m_Ram->store32(offset, value);
+    }
+
     /* Map to RAM Size */
     else if (RamSize.contains(addr)) {
         offset = RamSize.offset(addr);

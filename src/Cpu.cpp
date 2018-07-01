@@ -375,7 +375,7 @@ void Cpu::op_mtc0(uint32_t instruction)
         case 9:
         case 11:
 
-            if (value != 0){
+            if (value != 0) {
                 quitWithAddress("Cpu::op_mtc0: Unhandled write to breakpoint register",
                     value);
             }

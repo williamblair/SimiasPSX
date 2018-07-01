@@ -39,6 +39,10 @@ public:
      * to little endian and return it */
     uint32_t load32(uint32_t offset);
 
+    /* Store the 32bit value into 4 8bit chunks
+     * in our data */
+    void store32(uint32_t offset, uint32_t value);
+
 private:
 
     /* Constructor */
